@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : UserSql.xml
+    Description : 사용자 SQL
+    Modification Information
+
+    수정일       수정자     수정내용
+    ==========   =======    =============================
+    2021.07.15      허은미     최초 생성
+-->
+<mapper namespace="fsm.oned.user.mapper.UserMapper">
+
+    <!-- 회원정보 -->
+    <select id="selectUserInfo" resultType="myBatisBaseMap">
+        SELECT A.USER_ID
+             , A.USER_NM
+             , A.USER_TYPE
+             , A.MBL_NO
+             , A.PHONE_NO
+             , A.FAX_NO
+             , A.EMAIL_ID
+             , A.ZIPCD_ST
+             , A.ADDR1_ST
+             , A.ADDR2_ST
+             , A.REGION_CD
+             , A.LAT
+             , A.LON
+             , A.STREET_CD
+             , USER_CERT_DN
+             , CERT_POLICY
+             , A.COMP_NO_BLNG
+             , NVL(O.COMP_NM_KOR, A.COMP_NM_BLNG) COMP_NM_BLNG
+             , O.COMP_NO
+             , O.NFPIS_COMP_CD
+             , O.CEO_NM_KOR
+             , O.BIZ_REG_NO
+             , O.SUB_BIZ_REG_NO
+          FROM COMM.TC_USER_INFO A
+            LEFT JOIN COMM.TC_COMPANY_INFO O ON O.COMP_NO = A.COMP_NO_BLNG
+         WHERE A.USER_ID = #{sessionUser.USER_ID}
+    </select>
+
+
+    <!-- 회원정보 - 수정 -->
+    <update id="updateUserInfo">
+        UPDATE COMM.TC_USER_INFO
+           SET UPD_DT = SYSDATE
+             , UPD_ID = #{sessionUser.USER_ID}
+             , MBL_NO = #{MBL_NO}
+             , PHONE_NO = #{PHONE_NO}
+             , FAX_NO = #{FAX_NO}
+             , EMAIL_ID = #{EMAIL_ID}
+             , ZIPCD_ST = #{ZIPCD_ST}
+             , ADDR1_ST = #{ADDR1_ST}
+             , ADDR2_ST = #{ADDR2_ST}
+             , REGION_CD = #{REGION_CD}
+             , LAT = #{LAT}
+             , LON = #{LON}
+             , STREET_CD = #{STREET_CD}
+             , COMP_NO_BLNG = #{COMP_NO_BLNG}
+             , COMP_NM_BLNG = #{COMP_NM_BLNG}
+         WHERE USER_ID = #{USER_ID}
+           AND PASSWORD = COMM.PKG_ENCRYPT.HASH_DATA(#{PASSWORD})
+    </update>
+
+
+    <!-- 회원정보 - 비밀번호 확인 -->
+    <select id="selectUserPassword" resultType="myBatisBaseMap">
+        SELECT USER_ID
+          FROM COMM.TC_USER_INFO A
+         WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+           AND PASSWORD = (COMM.PKG_ENCRYPT.HASH_DATA(#{PASSWORD}))
+           AND NVL(USE_YN,'Y') = 'Y'
+           AND USER_TYPE IN ('4', '5', '6') <!-- 4 개인사용자, 5 업체대표자, 6 업체직원 -->
+    </select>
+
+
+    <!-- 회원정보 - 비밀번호 수정 -->
+    <update id="updateUserPassword">
+        UPDATE COMM.TC_USER_INFO
+           SET PASSWORD = (COMM.PKG_ENCRYPT.HASH_DATA(#{NEW_PASSWORD}))
+             , UPD_DT = SYSDATE
+             , UPD_ID = #{sessionUser.USER_ID}
+         WHERE USER_ID = #{USER_ID}
+           AND PASSWORD = (COMM.PKG_ENCRYPT.HASH_DATA(#{OLD_PASSWORD}))
+    </update>
+
+
+    <!-- 회원정보 - 업체정보 조회 -->
+    <select id="selectCompanyList" resultType="myBatisBaseMap">
+        SELECT A.COMP_NO /* 업체번호 */
+             , A.BIZ_REG_NO /* 사업자번호 */
+             , A.COMP_NM_KOR /* 업체명 */
+             , A.CEO_NM_KOR /* 대표자명 */
+        FROM COMM.TC_COMPANY_INFO A
+        WHERE  A.COMP_TYPE ='9'
+          AND NVL(A.USE_YN, 'N') = 'Y'
+          AND A.BIZ_REG_NO = REPLACE(#{BIZ_REG_NO}, '-', '')
+    </select>
+
+
+    <!-- 업체정보 -->
+    <select id="selectUserCompanyInfo" resultType="myBatisBaseMap">
+        SELECT A.USER_ID AS USER_ID /* 사용자ID */
+             , B.COMP_NO AS COMP_NO /* 업체번호 */
+             , A.USER_NM AS USER_NM /* 이름 */
+             , TO_CHAR(A.BIRTHDAY, 'YYYY-MM-DD') AS BIRTHDAY /* 생년월일 */
+             , A.MBL_NO AS MBL_NO /* 휴대전화번호 */
+             , A.EMAIL_ID AS EMAIL_ID /* 이메일 */
+            <if test='certUserMap.USER_GUBUN == "1"'><!-- 개인 -->
+                , A.USER_NM AS COMP_NM_KOR /* 업체명 */
+                , '' AS BIZ_REG_NO /*사업자번호*/
+                , A.USER_NM AS CEO_NM_KOR /* 대표자 */
+                , A.ZIPCD_ST AS COMP_ZIPCD_ST /* 업체 우편번호 */
+                , A.ADDR1_ST AS COMP_ADDR1_ST /* 업체 주소 */
+                , A.ADDR2_ST AS COMP_ADDR2_ST /* 업체 상세주소 */
+            </if>
+            <if test='certUserMap.USER_GUBUN == "2"'><!-- 업체 -->
+                , B.COMP_NM_KOR AS COMP_NM_KOR /* 업체명 */
+                , B.BIZ_REG_NO AS BIZ_REG_NO /*사업자번호*/
+                , B.CEO_NM_KOR AS CEO_NM_KOR /* 대표자 */
+                , B.COMP_ZIPCD_ST AS COMP_ZIPCD_ST /* 업체 우편번호 */
+                , B.COMP_ADDR1_ST AS COMP_ADDR1_ST /* 업체 주소 */
+                , B.COMP_ADDR2_ST AS COMP_ADDR2_ST /* 업체 상세주소 */
+            </if>
+             , C.CERT_ID AS CERT_ID /* 인증ID */
+             , C.CERT_NO AS CERT_NO /* 인증번호 */
+             , C.CERT_GUBUN AS CERT_GUBUN /* 인증 구분 */
+          FROM COMM.TC_USER_INFO A
+             LEFT JOIN COMM.TC_COMPANY_INFO B ON A.COMP_NO_BLNG = B.COMP_NO
+                <if test='certUserMap.USER_GUBUN == "1"'>
+                    LEFT JOIN COMM.TC_EDU_ORGANIC_CERT C ON A.USER_ID = C.CERT_ID
+                </if>
+                <if test='certUserMap.USER_GUBUN == "2"'>
+                    LEFT JOIN COMM.TC_EDU_ORGANIC_CERT C ON TO_CHAR(B.COMP_NO) = C.CERT_ID
+                </if>
+         WHERE 1 = 1
+           AND A.USER_ID = #{sessionUser.USER_ID}
+    </select>
+
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : SampleSql.xml
+    Description : Smaple SQL
+    Modification Information
+
+    수정일       수정자     수정내용
+    ==========   =======    =============================
+    2020.07.01       남상재     최초 생성
+-->
+<mapper namespace="fsm.oned.sample.mapper.SampleMapper">
+    <!-- 샘플 - 리스트조회 -->
+    <select id="selectSampleList" resultType="egovMap">
+        <![CDATA[
+        SELECT
+              DBMS_RANDOM.STRING('U', 10) AS a
+            , DBMS_RANDOM.STRING('U', 10) AS b
+            , DBMS_RANDOM.STRING('U', 10) AS c
+            , DBMS_RANDOM.STRING('U', 10) AS d
+            , DBMS_RANDOM.STRING('U', 10) AS e
+            , DBMS_RANDOM.STRING('U', 10) AS f
+--         LPAD(TO_CHAR(ROWNUM), 10, '0'),
+--         DBMS_RANDOM.STRING('U', 10),
+--         TO_CHAR(SYSDATE-TRUNC(DBMS_RANDOM.VALUE(365,36500)), 'YYYYMMDD'), --생일
+--         TO_CHAR(SYSDATE, 'YYYYMMDD'), --입력일자
+--         'DBMSEXPERT', --입력자ID
+--         '이경오'  --입력자명
+        FROM DUAL CONNECT BY LEVEL <= 1000
+        ]]>
+    </select>
+
+    <!-- 샘플 - 상세조회 -->
+    <select id="selectSampleDetail" resultType="egovMap">
+        <![CDATA[
+        SELECT
+               DBMS_RANDOM.STRING('U', 10) AS a
+             , DBMS_RANDOM.STRING('U', 10) AS b
+             , DBMS_RANDOM.STRING('U', 10) AS c
+             , DBMS_RANDOM.STRING('U', 10) AS d
+             , DBMS_RANDOM.STRING('U', 10) AS e
+             , DBMS_RANDOM.STRING('U', 10) AS f
+--         LPAD(TO_CHAR(ROWNUM), 10, '0'),
+--         DBMS_RANDOM.STRING('U', 10),
+--         TO_CHAR(SYSDATE-TRUNC(DBMS_RANDOM.VALUE(365,36500)), 'YYYYMMDD'), --생일
+--         TO_CHAR(SYSDATE, 'YYYYMMDD'), --입력일자
+--         'DBMSEXPERT', --입력자ID
+--         '이경오'  --입력자명
+        FROM DUAL
+        ]]>
+    </select>
+
+    <!-- 샘플 - 등록 -->
+    <insert id="insertSample">
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <!-- 샘플 - 수정 -->
+    <update id="updateSample">
+        SELECT 1 FROM DUAL
+    </update>
+
+    <!-- 샘플 - 삭제 -->
+    <delete id="deleteSample">
+        SELECT 1 FROM DUAL
+    </delete>
+</mapper>

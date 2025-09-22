@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : UserSql.xml
+    Description : 로그인 SQL
+    Modification Information
+
+    수정일       수정자     수정내용
+    ==========   =======    =============================
+    2021.07.15      허은미     최초 생성
+-->
+<mapper namespace="fsm.oned.login.mapper.LoginMapper">
+
+    <!-- 로그인 사용자 조회 -->
+    <select id="selectLoginInfo" resultType="myBatisBaseMap">
+        SELECT USER_ID
+             , USER_NM
+             , USER_TYPE
+             , PASSWORD
+             , RESIDENT_NO
+             , SEXUALITY
+             , BIRTHDAY
+             , MBL_NO
+             , PHONE_NO
+             , INT_PHONE_NO
+             , FAX_NO
+             , EMAIL_ID
+             , ZIPCD_ST
+             , ADDR1_ST
+             , ADDR2_ST
+             , ZIPCD_OLD
+             , ADDR1_OLD
+             , ADDR2_OLD
+             , ORGAN_CD_BLNG
+             , ORGAN_NM_BLNG
+             , DEPT_NM_BLNG
+             , COMP_NO_BLNG
+             , COMP_NM_BLNG
+             , (SELECT BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) BIZ_REG_NO
+             , (SELECT SUB_BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) SUB_BIZ_REG_NO
+             , (SELECT COMP_NM_KOR FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) COMP_NM_KOR
+             , (SELECT IMP_COMP_TYPE FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) IMP_COMP_TYPE
+             , POSITION_CD
+             , POSITION_NM
+             , SCE_SYS_CD
+             , USER_STATUS
+             , PERSONAL_AGREE_YN
+             , PERSONAL_AGREE_DT
+             , GPKI_AUTH_ID
+             , IPIN_ID
+             , PUB_IPIN_ID
+             , MBL_AUTH_ID
+             , LOGIN_FAIL_CNT
+             , LOGIN_FAIL_DT
+             , ACCT_LOCK_DT
+             , RECENT_PWD_CHG_DT
+             , RECENT_LOGIN_DT
+             , REMARK
+             , DEVICE_TYPE
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT
+             , REG_ID
+             , TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT
+             , UPD_ID
+             , USE_YN
+             , ROLE_CD
+             , BANK_CD
+             , ACCT_NO
+             , POSITION_DESCR
+             , HONOR_PWD
+             , COM_MCHN_USER_SCE_YN
+             , MIR_OTSD_USER_SCE_YN
+             , INTROF_SCE_YN
+             , EMPCODE_SCE_YN
+             , MAIN_EMP_SCE_YN
+             , TB_USER_SCE_YN
+             , REGION_CD
+             , LAT
+             , LON
+             , STREET_CD
+             , USER_NM_ENG
+             , ORGAN_CD
+             , (SELECT ORGAN_NM_KOR FROM COMM.TC_ORGAN_MASTER WHERE NVL(USE_YN, 'Y') = 'Y' AND ORGAN_CD = A.ORGAN_CD ) AS ORGAN_NM
+             , ONR_USER_ID
+             , CVMG_PASSWORD
+             , INITIAL_PWD_YN
+          FROM COMM.TC_USER_INFO A
+         WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+           AND PASSWORD = (COMM.PKG_ENCRYPT.HASH_DATA(#{PASSWORD}))
+           AND NVL(USE_YN,'Y') = 'Y'
+           AND USER_TYPE IN ('4', '5', '6') <!-- 4 개인사용자, 5 업체대표자, 6 업체직원 -->
+    </select>
+
+     <select id="selectcheckLoginInfoUser" resultType="myBatisBaseMap">
+          SELECT USER_ID
+          , USER_NM
+          , USER_TYPE
+          , PASSWORD
+          , RESIDENT_NO
+          , SEXUALITY
+          , BIRTHDAY
+          , MBL_NO
+          , PHONE_NO
+          , INT_PHONE_NO
+          , FAX_NO
+          , EMAIL_ID
+          , ZIPCD_ST
+          , ADDR1_ST
+          , ADDR2_ST
+          , ZIPCD_OLD
+          , ADDR1_OLD
+          , ADDR2_OLD
+          , ORGAN_CD_BLNG
+          , ORGAN_NM_BLNG
+          , DEPT_NM_BLNG
+          , COMP_NO_BLNG
+          , COMP_NM_BLNG
+          , (SELECT BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) BIZ_REG_NO
+          , (SELECT SUB_BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) SUB_BIZ_REG_NO
+          , (SELECT COMP_NM_KOR FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) COMP_NM_KOR
+          , (SELECT IMP_COMP_TYPE FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) IMP_COMP_TYPE
+          , POSITION_CD
+          , POSITION_NM
+          , SCE_SYS_CD
+          , USER_STATUS
+          , PERSONAL_AGREE_YN
+          , PERSONAL_AGREE_DT
+          , GPKI_AUTH_ID
+          , IPIN_ID
+          , PUB_IPIN_ID
+          , MBL_AUTH_ID
+          , LOGIN_FAIL_CNT
+          , LOGIN_FAIL_DT
+          , ACCT_LOCK_DT
+          , RECENT_PWD_CHG_DT
+          , RECENT_LOGIN_DT
+          , REMARK
+          , DEVICE_TYPE
+          , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT
+          , REG_ID
+          , TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT
+          , UPD_ID
+          , USE_YN
+          , ROLE_CD
+          , BANK_CD
+          , ACCT_NO
+          , POSITION_DESCR
+          , HONOR_PWD
+          , COM_MCHN_USER_SCE_YN
+          , MIR_OTSD_USER_SCE_YN
+          , INTROF_SCE_YN
+          , EMPCODE_SCE_YN
+          , MAIN_EMP_SCE_YN
+          , TB_USER_SCE_YN
+          , REGION_CD
+          , LAT
+          , LON
+          , STREET_CD
+          , USER_NM_ENG
+          , ORGAN_CD
+          , (SELECT ORGAN_NM_KOR FROM COMM.TC_ORGAN_MASTER WHERE NVL(USE_YN, 'Y') = 'Y' AND ORGAN_CD = A.ORGAN_CD ) AS ORGAN_NM
+          , ONR_USER_ID
+          , CVMG_PASSWORD
+          , INITIAL_PWD_YN
+          FROM COMM.TC_USER_INFO A
+          WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+          AND NVL(USE_YN,'Y') = 'Y'
+          AND USER_TYPE IN ('4', '5', '6') <!-- 4 개인사용자, 5 업체대표자, 6 업체직원 -->
+     </select>
+
+     <select id="selectcheckUserInfo" resultType="myBatisBaseMap">
+          SELECT USER_ID, CHECKCNT, CHECKDATE, FAILTIME
+          FROM COMM.TC_USER_INFO_CHECK
+          WHERE USER_ID = #{USER_ID}
+     </select>
+
+     <!--	초기값 넣어줌-->
+     <!--	<insert id="insertcheckUserInfo">-->
+     <!--		INSERT INTO TT_USER_INFO (USER_ID, CHECKCNT, CHECKDATE) VALUES ('kmss', 0, SYSDATE)-->
+     <!--	</insert>-->
+
+     <insert id="insertcheckUserInfo">
+          INSERT INTO COMM.TC_USER_INFO_CHECK
+          (
+               USER_ID /* 일련번호 */
+          , CHECKCNT /* 접근일자 */
+          , CHECKDATE
+          , FAILTIME
+          )
+          VALUES
+               (
+                    #{USER_ID} /* 일련번호 */
+               , 1 /* 접근일자 */
+               , SYSDATE  /* 사용자 아이디 */
+               , 0
+               )
+     </insert>
+     <update id="updatecheckUserInfo">
+          UPDATE COMM.TC_USER_INFO_CHECK SET CHECKCNT = CHECKCNT + 1, CHECKDATE = SYSDATE WHERE USER_ID= #{USER_ID}
+     </update>
+
+     <update id="updatecheckCntUserInfo">
+          UPDATE COMM.TC_USER_INFO_CHECK SET CHECKCNT = 0 , CHECKDATE = SYSDATE, FAILTIME = 0 WHERE USER_ID= #{USER_ID}
+     </update>
+
+     <update id="updatecheckFailtime">
+          UPDATE COMM.TC_USER_INFO_CHECK SET CHECKDATE = SYSDATE, FAILTIME = #{FAILTIME} WHERE USER_ID= #{USER_ID}
+     </update>
+
+     <insert id="insertcheckSuccessInfo">
+          INSERT INTO COMM.TC_USER_INFO_CHECK
+          (
+               USER_ID /* 일련번호 */
+          , CHECKCNT /* 접근일자 */
+          , CHECKDATE
+          , FAILTIME
+          )
+          VALUES
+               (
+                    #{USER_ID} /* 일련번호 */
+               , 0 /* 접근일자 */
+               , SYSDATE  /* 사용자 아이디 */
+               , 0
+               )
+     </insert>
+
+
+
+</mapper>

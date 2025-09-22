@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fsm.oned.comm.mapper.CommonMapper">
+
+	<!-- 로그인 사용자 조회 -->
+	<select id="selectLoginInfo" resultType="myBatisBaseMap">
+		SELECT USER_ID
+		, USER_NM
+		--, IMG_PATH
+		--, IMG_FILE_NM
+		--, SIGN_PATH
+		--, SIGN_FILE_NM
+		, USER_TYPE
+		, PASSWORD
+		, RESIDENT_NO
+		, SEXUALITY
+		, BIRTHDAY
+		, MBL_NO
+		, PHONE_NO
+		, INT_PHONE_NO
+		, FAX_NO
+		, EMAIL_ID
+		, ZIPCD_ST
+		, ADDR1_ST
+		, ADDR2_ST
+		, ZIPCD_OLD
+		, ADDR1_OLD
+		, ADDR2_OLD
+		, ORGAN_CD_BLNG
+		, ORGAN_NM_BLNG
+		, DEPT_NM_BLNG
+		, COMP_NO_BLNG
+		, COMP_NM_BLNG
+		, (SELECT BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) BIZ_REG_NO
+		, (SELECT SUB_BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) SUB_BIZ_REG_NO
+		, (SELECT COMP_NM_KOR FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) COMP_NM_KOR
+		, (SELECT IMP_COMP_TYPE FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) IMP_COMP_TYPE
+		, POSITION_CD
+		, POSITION_NM
+		, SCE_SYS_CD
+		, USER_STATUS
+		, PERSONAL_AGREE_YN
+		, PERSONAL_AGREE_DT
+		, GPKI_AUTH_ID
+		, IPIN_ID
+		, PUB_IPIN_ID
+		, MBL_AUTH_ID
+		, LOGIN_FAIL_CNT
+		, LOGIN_FAIL_DT
+		, ACCT_LOCK_DT
+		, RECENT_PWD_CHG_DT
+		, RECENT_LOGIN_DT
+		, REMARK
+		, DEVICE_TYPE
+		, TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT
+		, REG_ID
+		, TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT
+		, UPD_ID 
+		, USE_YN
+		, ROLE_CD
+		, BANK_CD
+		, ACCT_NO
+		, POSITION_DESCR
+		, HONOR_PWD
+		, COM_MCHN_USER_SCE_YN
+		, MIR_OTSD_USER_SCE_YN
+		, INTROF_SCE_YN
+		, EMPCODE_SCE_YN
+		, MAIN_EMP_SCE_YN
+		, TB_USER_SCE_YN
+		, REGION_CD
+		, LAT
+		, LON
+		, STREET_CD
+		, USER_NM_ENG
+		, ORGAN_CD
+		, (SELECT ORGAN_NM_KOR FROM COMM.TC_ORGAN_MASTER WHERE NVL(USE_YN, 'Y') = 'Y' AND ORGAN_CD = A.ORGAN_CD ) AS ORGAN_NM
+		, ONR_USER_ID
+		, CVMG_PASSWORD
+		, INITIAL_PWD_YN
+		FROM COMM.TC_USER_INFO A
+		WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+        AND PASSWORD = (COMM.PKG_ENCRYPT.HASH_DATA(#{PASSWORD}))
+		AND NVL(USE_YN,'Y') = 'Y'
+		AND USER_TYPE IN ('1', '2', '3', '4', '5', '6') <!-- 1 수품원공무원, 2 외부공무원, 3 공무직, 4 개인사용자, 5 업체대표자, 6 업체직원 -->
+	</select>
+
+	<!-- 로그인 사용자 조회 -->
+	<select id="selectLoginInfoSso" resultType="myBatisBaseMap">
+		SELECT USER_ID
+		, USER_NM
+		--, IMG_PATH
+		--, IMG_FILE_NM
+		--, SIGN_PATH
+		--, SIGN_FILE_NM
+		, USER_TYPE
+		, PASSWORD
+		, RESIDENT_NO
+		, SEXUALITY
+		, BIRTHDAY
+		, MBL_NO
+		, PHONE_NO
+		, INT_PHONE_NO
+		, FAX_NO
+		, EMAIL_ID
+		, ZIPCD_ST
+		, ADDR1_ST
+		, ADDR2_ST
+		, ZIPCD_OLD
+		, ADDR1_OLD
+		, ADDR2_OLD
+		, ORGAN_CD_BLNG
+		, ORGAN_NM_BLNG
+		, DEPT_NM_BLNG
+		, COMP_NO_BLNG
+		, COMP_NM_BLNG
+		, (SELECT BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) BIZ_REG_NO
+		, (SELECT SUB_BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) SUB_BIZ_REG_NO
+		, (SELECT COMP_NM_KOR FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) COMP_NM_KOR
+		, (SELECT IMP_COMP_TYPE FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = A.COMP_NO_BLNG) IMP_COMP_TYPE
+		, POSITION_CD
+		, POSITION_NM
+		, SCE_SYS_CD
+		, USER_STATUS
+		, PERSONAL_AGREE_YN
+		, PERSONAL_AGREE_DT
+		, GPKI_AUTH_ID
+		, IPIN_ID
+		, PUB_IPIN_ID
+		, MBL_AUTH_ID
+		, LOGIN_FAIL_CNT
+		, LOGIN_FAIL_DT
+		, ACCT_LOCK_DT
+		, RECENT_PWD_CHG_DT
+		, RECENT_LOGIN_DT
+		, REMARK
+		, DEVICE_TYPE
+		, TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT
+		, REG_ID
+		, TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT
+		, UPD_ID  
+		, USE_YN
+		, ROLE_CD
+		, BANK_CD
+		, ACCT_NO
+		, POSITION_DESCR
+		, HONOR_PWD
+		, COM_MCHN_USER_SCE_YN
+		, MIR_OTSD_USER_SCE_YN
+		, INTROF_SCE_YN
+		, EMPCODE_SCE_YN
+		, MAIN_EMP_SCE_YN
+		, TB_USER_SCE_YN
+		, REGION_CD
+		, LAT
+		, LON
+		, STREET_CD
+		, USER_NM_ENG
+		, ORGAN_CD
+		, (SELECT ORGAN_NM_KOR FROM COMM.TC_ORGAN_MASTER WHERE NVL(USE_YN, 'Y') = 'Y' AND ORGAN_CD = A.ORGAN_CD ) AS ORGAN_NM
+		, ONR_USER_ID
+		, CVMG_PASSWORD
+		, INITIAL_PWD_YN
+		FROM COMM.TC_USER_INFO A
+		WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+		AND NVL(USE_YN,'Y') = 'Y'
+        AND USER_TYPE IN ('1', '2', '3', '4', '5', '6') <!-- 1 수품원공무원, 2 외부공무원, 3 공무직, 4 개인사용자, 5 업체대표자, 6 업체직원 -->
+	</select>
+
+
+   <!-- 공통코드 조회 -->
+    <select id="selectCodeList" resultType="MyBatisBaseMap">
+        SELECT B.MSTR_CD
+             , B.DTL_CD AS CD
+             <choose>
+             <when test="labelNm =='ENG'">, B.DTL_NM_ENG AS CD_NM </when>
+             <when test="labelNm =='JPN'">, B.DTL_NM_JPN AS CD_NM </when>
+             <when test="labelNm =='CHN'">, B.DTL_NM_CHN AS CD_NM </when>
+             <when test="labelNm =='ETC'">, B.DTL_NM_ETC AS CD_NM </when>
+             <otherwise> , B.DTL_NM_KOR AS CD_NM </otherwise>
+             </choose>
+             , B.DTL_NM_KOR AS CD_NM_KOR
+             , B.DTL_NM_ENG AS CD_NM_ENG
+             , B.DTL_NM_JPN AS CD_NM_JPN
+             , B.DTL_NM_CHN AS CD_NM_CHN
+             , B.DTL_NM_ETC AS CD_NM_ETC
+          FROM TC_CD_MASTER A
+             , TC_CD_DETAIL B
+          WHERE A.MSTR_CD = B.MSTR_CD
+           AND A.MSTR_CD IN
+            <foreach collection="MSTR_CD" item="item"  index="index"  open="(" close=")" separator=",">
+              #{item}
+             </foreach>
+            <if test=' dMapCd1 != null and dMapCd1 != "" '> <!-- 상세 맵핑코드1 -->
+                AND B.MAP_CD1 = #{dMapCd1}
+            </if>
+            <if test=' dMapCd2 != null and dMapCd2 != "" '> <!-- 상세 맵핑코드2 -->
+                AND B.MAP_CD2 = #{dMapCd2}
+            </if>
+           AND A.USE_YN = 'Y'
+           AND B.USE_YN = 'Y'
+         ORDER BY B.MSTR_CD
+                , B.SORT_SEQ
+    </select>
+
+
+    <!-- 사용자 정의 코드 시작 -->
+    <!-- 사용자정의코드01 - 소속부서 -->
+    <select id="selectUserCode01List" resultType="myBatisBaseMap">
+        SELECT ORGAN_CD AS CD
+             , ORGAN_NM_KOR AS CD_NM
+         FROM TC_ORGAN_MASTER
+        WHERE USE_YN = 'Y'
+        ORDER BY ORGAN_CD
+    </select>
+
+    <!-- 사용자정의코드02 - 소속지원 -->
+    <select id="selectUserCode02List" resultType="myBatisBaseMap">
+        SELECT ORGAN_CD AS CD,
+               ORGAN_NM_KOR AS CD_NM
+        FROM COMM.TC_ORGAN_MASTER
+        WHERE USE_YN = 'Y'
+            AND MAP_CD3 IS NOT NULL
+        ORDER BY  ORGAN_CD
+    </select>
+
+    <!-- 사용자정의코드03 - 세부코드 지정값 -->
+    <select id="selectUserCode03List" resultType="myBatisBaseMap">
+        SELECT B.MSTR_CD
+        , B.DTL_CD AS CD
+        , B.DTL_NM_KOR AS CD_NM
+        , B.DTL_NM_KOR AS CD_NM_KOR
+        , B.DTL_NM_ENG AS CD_NM_ENG
+        , B.DTL_NM_JPN AS CD_NM_JPN
+        , B.DTL_NM_CHN AS CD_NM_CHN
+        , B.DTL_NM_ETC AS CD_NM_ETC
+        FROM COMM.TC_CD_MASTER A
+        , COMM.TC_CD_DETAIL B
+        WHERE A.MSTR_CD = B.MSTR_CD
+        AND A.MSTR_CD = #{MSTRCD}
+        AND A.USE_YN = 'Y'
+        AND B.USE_YN = 'Y'
+        <if test='DTL_CD != null and DTL_CD != ""'>
+            AND B.DTL_CD IN
+            <foreach item="item" index="index" collection="DTL_CD" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY B.MSTR_CD
+        , B.SORT_SEQ
+    </select>
+
+    <!-- 사용자정의코드04 시도 리스트 조회 -->
+    <select id="selectUserCode04List" resultType="myBatisBaseMap">
+        SELECT REGION_CD AS CD
+             , REGION_NM AS CD_NM
+        FROM IMST.TT_JRSDC_REGION_CD
+        WHERE REGION_LEVEL = 1
+          AND USE_YN = 'Y'
+    </select>
+
+    <!-- 사용자정의코드05 시군구 리스트 조회 -->
+    <select id="selectUserCode05List" resultType="myBatisBaseMap">
+        SELECT REGION_CD AS CD
+             , TRIM(REPLACE(REGION_NM , (SELECT REGION_NM
+                                           FROM IMST.TT_JRSDC_REGION_CD
+                                          WHERE REGION_CD = #{SC_SIDO_CD}) , '')) AS CD_NM
+        FROM IMST.TT_JRSDC_REGION_CD
+        WHERE REGION_LEVEL = 2
+        AND UP_REGION_CD = #{SC_SIDO_CD}
+        AND USE_YN = 'Y'
+    </select>
+
+    <!-- 사용자정의코드06 -->
+    <select id="selectUserCode06List" resultType="myBatisBaseMap">
+        SELECT B.MSTR_CD
+                 , B.DTL_CD AS CD
+                   , B.DTL_NM_KOR AS CD_NM
+                 , B.DTL_NM_KOR AS CD_NM_KOR
+                 , B.DTL_NM_ENG AS CD_NM_ENG
+                 , B.DTL_NM_JPN AS CD_NM_JPN
+                 , B.DTL_NM_CHN AS CD_NM_CHN
+                 , B.DTL_NM_ETC AS CD_NM_ETC
+              FROM COMM.TC_CD_MASTER A
+                 , COMM.TC_CD_DETAIL B
+              WHERE A.MSTR_CD = B.MSTR_CD
+               AND A.MSTR_CD = 'FS_304'
+               AND A.USE_YN = 'Y'
+               AND B.USE_YN = 'Y'
+               AND B.DTL_CD IN (1,3)
+             ORDER BY B.MSTR_CD
+                    , B.SORT_SEQ
+    </select>
+    <!-- 사용자 정의 코드 종료 -->
+
+
+
+    <!--  전체 메뉴 조회  -->
+    <select id="selectAllMenuList" resultType="myBatisBaseMap">
+         SELECT MENU_ID
+              , UPPER_MENU_ID
+              , (SELECT MENU_NM FROM TC_MENU WHERE MENU_ID = A.UPPER_MENU_ID) AS UPPER_MENU_NM
+              , MENU_NM
+              , URL
+              , TO_CHAR(LEVEL) AS LV
+              , CONNECT_BY_ROOT(MENU_ID) ROOT_MENU_ID
+              , SUBSTR(SYS_CONNECT_BY_PATH(MENU_NM,' > '),4) AS MENU_FULL_PATH /*전체 상위 메뉴명*/
+              , SCE_SYS_CD
+          FROM TC_MENU A
+          WHERE LEVEL  <![CDATA[<=]]>2
+         START WITH UPPER_MENU_ID IS NULL
+                AND SCE_SYS_CD = #{SCE_SYS_CD}
+                AND USE_YN = 'Y'
+           CONNECT BY PRIOR MENU_ID = UPPER_MENU_ID
+                        AND USE_YN = 'Y'
+             ORDER SIBLINGS BY A.MENU_ORDER
+    </select>
+
+    <!-- 사용자 메뉴 조회  -->
+    <select id="selectUserMenuList" resultType="myBatisBaseMap">
+        WITH TMP1 AS ( SELECT A.MENU_ID
+                  , MAX(B.AUTH_REG_YN) AS AUTH_REG_YN
+                  , MAX(B.AUTH_UPD_YN) AS AUTH_UPD_YN
+                  , MAX(B.AUTH_DEL_YN) AS AUTH_DEL_YN
+                  , MAX(B.AUTH_ADM_YN) AS AUTH_ADM_YN
+               FROM TC_GROUP_MENU A
+                  , TC_GROUP_USER B
+              WHERE A.GROUP_ID = B.GROUP_ID
+                AND B.USER_ID = #{USER_ID}
+                AND EXISTS (SELECT 'O' FROM TC_GROUP E WHERE A.GROUP_ID = B.GROUP_ID AND USE_YN = 'Y' AND E.SCE_SYS_CD =  #{SCE_SYS_CD})
+                AND A.USE_YN ='Y'
+                AND B.USE_YN ='Y'
+             GROUP BY A.MENU_ID)
+         SELECT A.MENU_ID
+              , A.UPPER_MENU_ID
+              , A.MENU_NM
+              , A.URL
+              , TO_CHAR(LEVEL) AS LV
+              , CONNECT_BY_ROOT(A.MENU_ID) ROOT_MENU_ID
+              , SUBSTR(SYS_CONNECT_BY_PATH(MENU_NM,' > '),4) AS MENU_FULL_PATH /*전체 상위 메뉴명*/
+              , B.AUTH_REG_YN
+              , B.AUTH_UPD_YN
+              , B.AUTH_DEL_YN
+              , B.AUTH_ADM_YN
+          FROM TC_MENU A
+             , TMP1 B
+          WHERE A.MENU_ID = B.MENU_ID(+)
+           AND LEVEL <![CDATA[<=]]>3
+           AND A.MENU_ID IN ( SELECT MENU_ID
+                              FROM TC_MENU S1
+                            WHERE 1=1
+                            START WITH S1.MENU_ID IN (SELECT MENU_ID FROM TMP1)
+                              AND USE_YN = 'Y'
+                                CONNECT BY PRIOR UPPER_MENU_ID = MENU_ID
+                          )
+         START WITH A.UPPER_MENU_ID IS NULL
+                AND A.SCE_SYS_CD =  #{SCE_SYS_CD}
+                AND A.USE_YN = 'Y'
+           CONNECT BY PRIOR A.MENU_ID = A.UPPER_MENU_ID
+                        AND A.USE_YN = 'Y'
+             ORDER SIBLINGS BY A.MENU_ORDER
+    </select>
+    
+     <!-- 사용자 선택 메뉴 참조 URL 조회  -->
+    <select id="selectUserMenuRefUrlList" resultType="myBatisBaseMap">
+        SELECT REF_URL
+          FROM TC_MENU_REF_URL
+         WHERE MENU_ID = #{MENU_ID}
+           AND USE_YN = 'Y'
+    </select>
+    
+    <!-- 메뉴 접근 가능여부  -->
+    <select id="selectAccessMenuAt" resultType="String">
+       SELECT NVL2(A.MENU_ID,'Y','N') AS ACCESS_AT
+         FROM TC_GROUP_MENU A
+            , TC_MENU B
+        WHERE A.MENU_ID = B.MENU_ID
+          AND A.USE_YN = 'Y'
+          AND B.USE_YN = 'Y'     
+          AND B.URL LIKE #{URL}||'%'
+          AND EXISTS (SELECT 'O' FROM COMM.TC_GROUP E WHERE E.GROUP_ID = A.GROUP_ID AND E.USE_YN = 'Y' AND E.SCE_SYS_CD = #{sessionUser.SCE_SYS_CD})
+          AND EXISTS (SELECT 'O' FROM COMM.TC_GROUP_USER E WHERE E.GROUP_ID = A.GROUP_ID AND E.USE_YN = 'Y' AND E.USER_ID = #{sessionUser.USER_ID}  )
+          AND ROWNUM = 1
+    </select>
+    
+    <!-- URL로 메뉴가 있는지 조회   -->
+    <select id="selectCurrentMenuAt" resultType="String">
+       SELECT NVL2(A.MENU_ID,'Y','N') AS ACCESS_AT
+         FROM TC_MENU A
+        WHERE A.USE_YN = 'Y'               
+          <!-- 파라메터 2개까지만 체크  -->
+          AND A.URL LIKE #{URL}||CHR(63)||'%'
+          AND #{URL_STR} LIKE '%'||REGEXP_SUBSTR(REPLACE(A.URL,#{URL}||CHR(63),''),'[^&amp;]+',1,1)||'%'
+          AND #{URL_STR} LIKE '%'||REGEXP_SUBSTR(REPLACE(A.URL,#{URL}||CHR(63),''),'[^&amp;]+',1,2)||'%'
+          AND ROWNUM = 1
+    </select>
+    
+    <!-- 통합관리자 그룹 여부  -->
+    <select id="selectIntgrMngrYn" resultType="String">
+       SELECT INTGR_MNGR_YN           
+         FROM TC_GROUP A
+            , TC_GROUP_USER B
+        WHERE A.GROUP_ID = B.GROUP_ID 
+          AND SCE_SYS_CD = #{SCE_SYS_CD}
+          AND B.USER_ID = #{USER_ID}
+          AND B.USE_YN = 'Y'
+          AND A.INTGR_MNGR_YN = 'Y'
+          AND ROWNUM = 1
+    </select>
+    
+     <!-- 메뉴 접속 로그 등록  -->
+    <insert id="insertTcMenuAccessStat">
+        INSERT INTO TC_MENU_ACCESS_STAT
+        (   ACCESS_NO /* 일련번호 */
+          , ACCESS_DATE /* 접근일자 */
+          , USER_ID /* 사용자 아이디 */
+          , USER_IP /* 사용자 아이피 */
+          , MENU_ID /* 메뉴아이디 */
+          , MENU_NM /* 메뉴명 */
+          , MENU_FULL_PATH /* 메뉴전체경로 */
+          , SCE_SYS_CD /*시스템구분*/
+        )
+        VALUES
+        (
+            (SELECT NVL(MAX(ACCESS_NO),0)+1 FROM TC_MENU_ACCESS_STAT) /* 일련번호 */
+          , SYSDATE /* 접근일자 */
+          , #{sessionUser.USER_ID}  /* 사용자 아이디 */
+          , #{USER_IP} /* 사용자 아이피 */
+          , #{CURRENT_MENU_ID} /* 메뉴아이디 */
+          , #{CURRENT_MENU_NM} /* 메뉴명 */
+          , #{CURRENT_MENU_URL} /* 메뉴전체경로명 */
+          , #{SCE_SYS_CD}
+        )
+    </insert>
+
+
+    <!-- 배너리스트 -->
+    <resultMap id="getBannerDataMap" type="HashMap">
+            <result property="BANNER_IMG_DATA" column="BANNER_IMG_DATA" jdbcType="CLOB" javaType="java.lang.String"/>
+        </resultMap>
+    <select id="selectBannerList" resultMap="getBannerDataMap">
+        SELECT BANNER_TITLE
+             , BANNER_LOC
+             , URL
+             , BANNER_IMG_NM
+             , NEW_WNDW_YN
+             , BANNER_IMG_DATA
+        FROM COMM.TC_BANNER
+        WHERE USE_YN = 'Y'
+          AND SCE_SYS_CD = '15'
+          AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN TO_CHAR(PST_PRD_BGN, 'YYYYMMDD') AND TO_CHAR(PST_PRD_END, 'YYYYMMDD')
+        ORDER BY SORT_SEQ DESC
+    </select>
+
+</mapper> 

@@ -1,0 +1,1056 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : EduSql.xml
+    Description : 교육 SQL
+    Modification Information
+
+    수정일       수정자     수정내용
+    ==========   =======    =============================
+    2021.07.15      허은미     최초 생성
+-->
+<mapper namespace="fsm.oned.edu.mapper.EduMapper">
+
+    <!-- 교육신청 리스트 조회 -->
+    <select id="selectEduPlanList" resultType="myBatisBaseMap">
+        <include refid="IncludeSql.paging-start"></include>
+        SELECT EDU_ID
+             , EDU_TITLE  /* 교육명 */
+             , EDU_GUBUN  /* 교육구분 */
+             , (SELECT COMM.FN_COMCODE_NM('FS_446', EDU_GUBUN) FROM DUAL) AS EDU_GUBUN_NM  /* 교육구분명 */
+             , EDU_STATUS  /* 교육상태 */
+             , (SELECT COMM.FN_COMCODE_NM('FS_447', EDU_STATUS) FROM DUAL) AS EDU_STATUS_NM  /* 교육상태명 */
+             , EDU_TIME || '시간' AS EDU_TIME  /* 교육시간 */
+             , LOCKUP_CNT  /* 조회수 */
+             , ATTACH_FILE_ID  /* 첨부파일ID */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT  /* 최초 자료등록일 */
+             , REG_ID  /* 최초 자료 등록자 ID */
+             , TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT  /* 최근 자료수정 */
+             , UPD_ID  /* 최근 자료 수정자ID */
+             , TO_CHAR(DEL_DT,'YYYY-MM-DD') AS DEL_DT  /* 자료 삭제일 */
+             , DEL_ID  /* 자료 삭제자 ID */
+             , GBN
+          FROM COMM.TC_EDU_PLAN
+         WHERE USE_YN = 'Y'
+            AND GBN = 1
+            <if test='EDU_GUBUN != "" and EDU_GUBUN != null '> <!-- 교육구분 -->
+                AND EDU_GUBUN = #{EDU_GUBUN}
+            </if>
+            <if test='EDU_STATUS != "" and EDU_STATUS != null '> <!-- 교육상태 -->
+                AND EDU_STATUS = #{EDU_STATUS}
+            </if>
+            <if test='EDU_TITLE != "" and EDU_TITLE != null '> <!-- 교육명 -->
+                AND EDU_TITLE LIKE '%'||#{EDU_TITLE}||'%'
+            </if>
+        ORDER BY EDU_GUBUN, EDU_ID
+        <include refid="IncludeSql.paging-end"></include>
+    </select>
+
+    <!-- 교육신청 리스트 조회 -->
+    <select id="selectEduPlanHaccpList" resultType="myBatisBaseMap">
+        <include refid="IncludeSql.paging-start"></include>
+        SELECT EDU_ID
+             , EDU_TITLE  /* 교육명 */
+             , EDU_GUBUN  /* 교육구분 */
+             , (SELECT COMM.FN_COMCODE_NM('FS_446', EDU_GUBUN) FROM DUAL) AS EDU_GUBUN_NM  /* 교육구분명 */
+             , EDU_STATUS  /* 교육상태 */
+             , (SELECT COMM.FN_COMCODE_NM('FS_447', EDU_STATUS) FROM DUAL) AS EDU_STATUS_NM  /* 교육상태명 */
+             , EDU_TIME || '시간' AS EDU_TIME  /* 교육시간 */
+             , LOCKUP_CNT  /* 조회수 */
+             , ATTACH_FILE_ID  /* 첨부파일ID */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT  /* 최초 자료등록일 */
+             , REG_ID  /* 최초 자료 등록자 ID */
+             , TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT  /* 최근 자료수정 */
+             , UPD_ID  /* 최근 자료 수정자ID */
+             , TO_CHAR(DEL_DT,'YYYY-MM-DD') AS DEL_DT  /* 자료 삭제일 */
+             , DEL_ID  /* 자료 삭제자 ID */
+             , GBN
+          FROM COMM.TC_EDU_PLAN
+         WHERE USE_YN = 'Y'
+            AND GBN = 2
+            <if test='EDU_GUBUN != "" and EDU_GUBUN != null '> <!-- 교육구분 -->
+                AND EDU_GUBUN = #{EDU_GUBUN}
+            </if>
+            <if test='EDU_STATUS != "" and EDU_STATUS != null '> <!-- 교육상태 -->
+                AND EDU_STATUS = #{EDU_STATUS}
+            </if>
+            <if test='EDU_TITLE != "" and EDU_TITLE != null '> <!-- 교육명 -->
+                AND EDU_TITLE LIKE '%'||#{EDU_TITLE}||'%'
+            </if>
+        ORDER BY EDU_GUBUN, EDU_ID
+        <include refid="IncludeSql.paging-end"></include>
+    </select>
+
+
+    <!-- 교육신청 - 상세 조회 -->
+    <resultMap id="getEduPlanDetailMap" type="HashMap">
+        <result property="DES" column="DES" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+    <select id="selectEduPlanDetail" resultMap="getEduPlanDetailMap">
+        SELECT EDU_ID
+             , EDU_TITLE  /* 교육명 */
+             , EDU_GUBUN  /* 교육구분 */
+             , (SELECT COMM.FN_COMCODE_NM('FS_446', EDU_GUBUN) FROM DUAL) AS EDU_GUBUN_NM  /* 교육구분명 */
+             , EDU_STATUS  /* 교육상태 */
+             , (SELECT COMM.FN_COMCODE_NM('FS_447', EDU_STATUS) FROM DUAL) AS EDU_STATUS_NM  /* 교육상태명 */
+             , EDU_TIME || '시간' AS EDU_TIME  /* 교육시간 */
+             , DES  /* 내용 */
+             , DES_TEXT  /* 내용 요약 */
+             , LOCKUP_CNT  /* 조회수 */
+             , ATTACH_FILE_ID  /* 첨부파일ID */
+             , USE_YN  /* 사용여부 */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT  /* 최초 자료등록일 */
+             , REG_ID  /* 최초 자료 등록자 ID */
+             , TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT  /* 최근 자료수정 */
+             , UPD_ID  /* 최근 자료 수정자ID */
+             , TO_CHAR(DEL_DT,'YYYY-MM-DD') AS DEL_DT  /* 자료 삭제일 */
+             , DEL_ID
+             , GBN
+          FROM COMM.TC_EDU_PLAN
+         WHERE EDU_ID = #{EDU_ID}
+    </select>
+
+
+    <!-- 교육신청 - 조회수 count -->
+    <update id="increaseEduPlanLockupCnt">
+        UPDATE COMM.TC_EDU_PLAN
+           SET LOCKUP_CNT = NVL(LOCKUP_CNT,0) + 1
+         WHERE EDU_ID = #{EDU_ID}
+    </update>
+
+
+    <!-- 교육신청 - 목차 상세 조회 -->
+    <select id="selectEduContentsList" resultType="myBatisBaseMap">
+        SELECT EDU_ID  /* 교육ID */
+             , CLASS_ORD /* 차시 */
+             , TITLE /* 강의명 */
+             , CLASS_TIME /* 총 강의시간 */
+          FROM TC_EDU_BOARD_DATA
+         WHERE USE_YN = 'Y'
+           AND EDU_BOARD_ID = 'EDUBOARD002' /* 강의게시판ID */
+           AND EDU_ID = #{EDU_ID}
+           ORDER BY CLASS_ORD
+    </select>
+
+
+    <!-- 교육신청서 - 상세 조회 -->
+    <select id="selectEduApplyInfo" resultType="myBatisBaseMap">
+        SELECT A.EDU_APLY_NO /* 교육신청번호 */
+             , A.EDU_ID /* 교육ID */
+             , B.EDU_GUBUN /* 교육구분 */
+             , A.COMP_NM_KOR /* 업체명 */
+             , A.CEO_NM_KOR /* 대표자 */
+             , REGEXP_REPLACE(A.BIZ_REG_NO, '(.{3})(.+)(.{5})', '\1-\2-\3') AS BIZ_REG_NO /* 사업자번호 */
+             , A.COMP_ZIPCD_ST /* 업체 우편번호 */
+             , A.COMP_ADDR1_ST /* 업체 주소 */
+             , A.COMP_ADDR2_ST /* 업체 상세주소 */
+             , A.CERT_NO /* 친환경 인증번호 */
+             , A.EDU_APLY_UNIT /* 교육 신청 단위 */
+             , A.EDU_APLY_ID /* 교육 신청자ID */
+             , A.EDU_APLY_NM /* 교육 신청자 성명 */
+<!--              , COMM.PKG_ENCRYPT.DECRYPT_DATA(A.EDU_APLY_BIRTH) AS EDU_APLY_BIRTH /* 교육 신청자 생년원일 */ -->
+             , A.EDU_APLY_WORK /* 교육 신청자 담당업무 */
+<!--              , COMM.PKG_ENCRYPT.DECRYPT_DATA(A.EDU_APLY_TEL) AS EDU_APLY_TEL /* 교육 신청자 전화번호 */ -->
+<!--              , COMM.PKG_ENCRYPT.DECRYPT_DATA(A.EDU_APLY_EMAIL) AS EDU_APLY_EMAIL /* 교육 신청자 이메일 */ -->
+             , A.EDU_CERT_METHOD /* 인증종류 */
+             , A.EDU_APLY_SIGN /* 교육 신청자 서명 */
+             , A.PRIVACY_AGREE_YN /* 개인정보 활용 동의여부 */
+             , A.PRIVACY_AGREE_NM /* 개인정보 활용 서명인 */
+             , TO_CHAR(A.EDU_APLY_DT, 'YYYY-MM-DD') AS EDU_APLY_DT /* 교육 신청일 */
+             , A.EDU_CERT_NO /* 교육 이수증 번호 */
+             , A.GBN
+          FROM COMM.TC_EDU_APLY A
+             , COMM.TC_EDU_PLAN B
+         WHERE A.EDU_ID = B.EDU_ID
+           AND A.EDU_APLY_ID = #{sessionUser.USER_ID}
+            <if test='EDU_APLY_NO == "" or EDU_APLY_NO == null '>
+                AND ROWNUM = 1
+            </if>
+            <if test='EDU_APLY_NO != "" and EDU_APLY_NO != null '>
+                AND A.EDU_APLY_NO = #{EDU_APLY_NO}
+            </if>
+        ORDER BY EDU_APLY_DT DESC
+    </select>
+    
+    
+    <!-- 교육신청서 - 권한확인 -->
+    <select id="checkEduApplyInfo" resultType="int">
+        SELECT COUNT(*)
+          FROM TC_EDU_APLY
+         WHERE 1 = 1
+            <if test='sessionUser.USER_TYPE == "5" or sessionUser.USER_TYPE == "6"'><!--  업체대표자, 6 업체직원 -->
+                AND BIZ_REG_NO = #{sessionUser.BIZ_REG_NO}
+            </if>
+            <if test='sessionUser.USER_TYPE != "5" and sessionUser.USER_TYPE != "6"'>
+                AND EDU_APLY_ID = #{sessionUser.USER_ID}
+            </if>
+            <if test='EDU_APLY_NO != "" and EDU_APLY_NO != null '>
+                AND EDU_APLY_NO = #{EDU_APLY_NO}
+            </if>
+            <if test='EDU_CERT_NO != "" and EDU_CERT_NO != null '>
+                AND EDU_CERT_NO = #{EDU_CERT_NO}
+            </if>
+    </select>
+
+
+    <!-- 교육신청서 - 등록 -->
+    <insert id="insertEduApply">
+        <selectKey resultType="string" keyProperty="EDU_APLY_NO" order="BEFORE">
+            SELECT TO_CHAR(SYSDATE, 'YYYY')
+                || '-' || LPAD(#{EDU_GUBUN}, 2, '0')
+                || '-' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(EDU_APLY_NO, 9, LENGTH(EDU_APLY_NO)))), 0) + 1, 4, '0') AS EDU_APLY_NO
+              FROM COMM.TC_EDU_APLY A, COMM.TC_EDU_PLAN B
+             WHERE A.EDU_ID = B.EDU_ID
+               AND TO_CHAR(EDU_APLY_DT, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+               AND B.EDU_GUBUN = #{EDU_GUBUN}
+        </selectKey>
+        INSERT INTO COMM.TC_EDU_APLY
+            ( EDU_APLY_NO /* 교육신청번호 */
+            , EDU_ID /* 교육ID */
+            , COMP_NM_KOR /* 업체명 */
+            , CEO_NM_KOR /* 대표자 */
+            , BIZ_REG_NO /* 사업자번호 */
+            , COMP_ZIPCD_ST /* 업체 우편번호 */
+            , COMP_ADDR1_ST /* 업체 주소 */
+            , COMP_ADDR2_ST /* 업체 상세주소 */
+            , CERT_NO /* 인증ID */
+            , EDU_APLY_UNIT /* 교육 신청 단위 */
+            , EDU_APLY_ID /* 교육 신청자ID */
+            , EDU_APLY_NM /* 교육 신청자 성명 */
+            , EDU_APLY_BIRTH /* 교육 신청자 생년원일 */
+            , EDU_APLY_WORK /* 교육 신청자 담당업무 */
+            , EDU_APLY_TEL /* 교육 신청자 전화번호 */
+            , EDU_APLY_EMAIL /* 교육 신청자 이메일 */
+            , EDU_CERT_METHOD /* 인증종류 */
+            , EDU_APLY_SIGN /* 교육 신청자 서명 */
+            , PRIVACY_AGREE_YN /* 개인정보 활용 동의여부 */
+            , PRIVACY_AGREE_NM /* 개인정보 활용 서명인 */
+            , EDU_APLY_DT /* 교육 신청일 */
+            , EDU_END_DT /* 교육 종료일 */
+            , EDU_CERT_NO /* 교육 이수증 번호 */
+            , GBN
+            )
+        VALUES
+            ( #{EDU_APLY_NO} /* 교육신청번호 */
+            , #{EDU_ID} /* 교육ID */
+            , #{COMP_NM_KOR} /* 업체명 */
+            , #{CEO_NM_KOR} /* 대표자 */
+            , REPLACE(#{BIZ_REG_NO}, '-', '') /* 사업자번호 */
+            , #{COMP_ZIPCD_ST} /* 업체 우편번호 */
+            , #{COMP_ADDR1_ST} /* 업체 주소 */
+            , #{COMP_ADDR2_ST} /* 업체 상세주소 */
+            , #{CERT_NO} /* 인증ID */
+            , #{EDU_APLY_UNIT} /* 교육 신청 단위 */
+            , #{sessionUser.USER_ID} /* 교육 신청자ID */
+            , #{EDU_APLY_NM} /* 교육 신청자 성명 */
+            , COMM.PKG_ENCRYPT.ENCRYPT_DATA(#{EDU_APLY_BIRTH}) /* 교육 신청자 생년원일 */
+            , #{EDU_APLY_WORK} /* 교육 신청자 담당업무 */
+            , COMM.PKG_ENCRYPT.ENCRYPT_DATA(#{EDU_APLY_TEL}) /* 교육 신청자 전화번호 */
+            , COMM.PKG_ENCRYPT.ENCRYPT_DATA(#{EDU_APLY_EMAIL}) /* 교육 신청자 이메일 */
+            , #{EDU_CERT_METHOD_ARR} /* 인증종류 */
+            , #{EDU_APLY_SIGN} /* 교육 신청자 서명 */
+            , #{PRIVACY_AGREE_YN} /* 개인정보 활용 동의여부 */
+            , #{PRIVACY_AGREE_NM} /* 개인정보 활용 서명인 */
+            , SYSDATE /* 교육 신청일 */
+            , ADD_MONTHS(SYSDATE, 2) /* 교육 종료일 */
+            , #{EDU_CERT_NO} /* 교육 이수증 번호 */
+            , #{GBN}
+            )
+    </insert>
+
+
+    <!-- 교육신청서 - 등록 -->
+        <insert id="insertEduHaccpApply">
+        <selectKey resultType="string" keyProperty="EDU_APLY_NO" order="BEFORE">
+            SELECT TO_CHAR(SYSDATE, 'YYYY')
+                || '-' || LPAD(#{EDU_GUBUN}, 2, '0')
+                || '-' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(EDU_APLY_NO, 9, LENGTH(EDU_APLY_NO)))), 0) + 1, 4, '0') AS EDU_APLY_NO
+              FROM COMM.TC_EDU_APLY A, COMM.TC_EDU_PLAN B
+             WHERE A.EDU_ID = B.EDU_ID
+               AND TO_CHAR(EDU_APLY_DT, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+               AND B.EDU_GUBUN = #{EDU_GUBUN}
+        </selectKey>
+        INSERT INTO COMM.TC_EDU_APLY
+            ( EDU_APLY_NO /* 교육신청번호 */
+            , EDU_ID /* 교육ID */
+            , COMP_NM_KOR /* 업체명 */
+            , CEO_NM_KOR /* 대표자 */
+            , BIZ_REG_NO /* 사업자번호 */
+            , COMP_ZIPCD_ST /* 업체 우편번호 */
+            , COMP_ADDR1_ST /* 업체 주소 */
+            , COMP_ADDR2_ST /* 업체 상세주소 */
+            , CERT_NO /* 인증ID */
+            , EDU_APLY_UNIT /* 교육 신청 단위 */
+            , EDU_APLY_ID /* 교육 신청자ID */
+            , EDU_APLY_NM /* 교육 신청자 성명 */
+            , EDU_APLY_BIRTH /* 교육 신청자 생년원일 */
+            , EDU_APLY_WORK /* 교육 신청자 담당업무 */
+            , EDU_APLY_TEL /* 교육 신청자 전화번호 */
+            , EDU_APLY_EMAIL /* 교육 신청자 이메일 */
+            , EDU_CERT_METHOD /* 인증종류 */
+            , EDU_APLY_SIGN /* 교육 신청자 서명 */
+            , PRIVACY_AGREE_YN /* 개인정보 활용 동의여부 */
+            , PRIVACY_AGREE_NM /* 개인정보 활용 서명인 */
+            , EDU_APLY_DT /* 교육 신청일 */
+            , EDU_END_DT /* 교육 종료일 */
+            , EDU_CERT_NO /* 교육 이수증 번호 */
+            , GBN
+            )
+        VALUES
+            ( #{EDU_APLY_NO} /* 교육신청번호 */
+            , #{EDU_ID} /* 교육ID */
+            , #{COMP_NM_KOR} /* 업체명 */
+            , #{CEO_NM_KOR} /* 대표자 */
+            , REPLACE(#{BIZ_REG_NO}, '-', '') /* 사업자번호 */
+            , #{COMP_ZIPCD_ST} /* 업체 우편번호 */
+            , #{COMP_ADDR1_ST} /* 업체 주소 */
+            , #{COMP_ADDR2_ST} /* 업체 상세주소 */
+            , #{CERT_NO} /* 인증ID */
+            , #{EDU_APLY_UNIT} /* 교육 신청 단위 */
+            , #{sessionUser.USER_ID} /* 교육 신청자ID */
+            , #{EDU_APLY_NM} /* 교육 신청자 성명 */
+            , COMM.PKG_ENCRYPT.ENCRYPT_DATA(#{EDU_APLY_BIRTH}) /* 교육 신청자 생년원일 */
+            , #{EDU_APLY_WORK} /* 교육 신청자 담당업무 */
+            , COMM.PKG_ENCRYPT.ENCRYPT_DATA(#{EDU_APLY_TEL}) /* 교육 신청자 전화번호 */
+            , COMM.PKG_ENCRYPT.ENCRYPT_DATA(#{EDU_APLY_EMAIL}) /* 교육 신청자 이메일 */
+            , #{EDU_CERT_METHOD_ARR} /* 인증종류 */
+            , #{EDU_APLY_SIGN} /* 교육 신청자 서명 */
+            , #{PRIVACY_AGREE_YN} /* 개인정보 활용 동의여부 */
+            , #{PRIVACY_AGREE_NM} /* 개인정보 활용 서명인 */
+            , SYSDATE /* 교육 신청일 */
+            , (SELECT TO_DATE(TO_CHAR(SYSDATE, 'YYYY') || '-12-31', 'YYYY-MM-DD') FROM dual)             /* 교육 종료일 */
+            , #{EDU_CERT_NO} /* 교육 이수증 번호 */
+            , #{GBN}
+            )
+    </insert>
+
+    <!-- 교육신청서 - 강의 리스트 조회 -->
+    <select id="selectEduClassList" resultType="MyBatisBaseMap">
+        SELECT ROWNUM AS RNUM
+             , B.EDU_APLY_NO /* 교육신청번호 */
+             , A.EDU_ID /* 교육ID */
+             , A.ORD_NO /* 강의순번 */
+             , A.TITLE /* 강의명 */
+             , A.ATTACH_FILE_ID /* 첨부파일ID */
+             , NVL(C.STUDY_RATE, 0) AS STUDY_RATE /* 학습 진도율 */
+             , NVL(TO_CHAR(TRUNC(SYSDATE) + NUMTODSINTERVAL(C.STUDY_TIME, 'second'),'hh24:mi:ss'), '00:00:00') AS STUDY_TIME /* 학습시간 */
+             , TO_CHAR(C.STUDY_START_DT, 'YYYY-MM-DD HH24:MI:SS') AS STUDY_START_DT /* 학습시작일 */
+             , TO_CHAR(C.STUDY_END_DT, 'YYYY-MM-DD HH24:MI:SS') AS STUDY_END_DT /* 학습종료일 */
+             , A.GBN
+        FROM COMM.TC_EDU_BOARD_DATA A
+         LEFT OUTER JOIN COMM.TC_EDU_APLY B
+            ON B.EDU_ID = A.EDU_ID
+         LEFT OUTER JOIN COMM.TC_EDU_STATUS C
+            ON C.EDU_APLY_NO = B.EDU_APLY_NO AND C.ORD_NO = A.ORD_NO
+        WHERE A.USE_YN = 'Y'
+          AND A.EDU_ID = #{EDU_ID}
+          AND A.EDU_BOARD_ID = 'EDUBOARD002' /* 강의게시판ID */
+          AND B.EDU_APLY_NO = #{EDU_APLY_NO}
+        ORDER BY A.ORD_NO ASC
+    </select>
+
+
+    <!-- 교육신청서 - 교육진도 등록 -->
+    <insert id="insertStudyStatus">
+        INSERT INTO COMM.TC_EDU_STATUS
+                    ( EDU_APLY_NO /* 교육신청번호 */
+                    , EDU_ID /* 교육ID */
+                    , ORD_NO /* 강희 회차 순번 */
+                    , STUDY_TIME /* 학습시간(초) */
+                    , STUDY_RATE /* 학습 진도율 */
+                    , GBN
+                    )
+                VALUES
+                    ( #{EDU_APLY_NO} /* 교육신청번호 */
+                    , #{EDU_ID} /* 교육ID */
+                    , #{ORD_NO} /* 강희 회차 순번 */
+                    , 0 /* 학습시간(초) */
+                    , 0 /* 학습 진도율 */
+                    , #{GBN}
+                    )
+    </insert>
+
+
+    <!-- 교육 신청자 담당업무 - 사용자 정의 코드 -->
+    <select id="selectEduApplyWorkOptions" resultType="MyBatisBaseMap">
+        SELECT B.MSTR_CD
+             , B.DTL_CD AS CD
+             , B.DTL_NM_KOR AS CD_NM
+         FROM TC_CD_MASTER A
+            , TC_CD_DETAIL B
+        WHERE A.MSTR_CD = B.MSTR_CD
+          AND A.MSTR_CD IN
+            <foreach collection="MSTR_CD" item="item"  index="index"  open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            <if test='EDU_APLY_UNIT != "" and EDU_APLY_UNIT != null '>
+                AND (B.MAP_CD1 = '0' OR B.MAP_CD1 = #{EDU_APLY_UNIT})
+            </if>
+          AND A.USE_YN = 'Y'
+          AND B.USE_YN = 'Y'
+        ORDER BY B.MSTR_CD, B.SORT_SEQ
+    </select>
+
+
+    <!-- 나의 강의실 - 학습상태 조회 -->
+    <select id="selectStudyStatusList" resultType="myBatisBaseMap">
+        SELECT A.DTL_CD AS STUDY_STATUS /* 학습상태 */
+             , A.DTL_NM_KOR AS STUDY_STATUS_NM /* 학습상태명 */
+             , COUNT(B.STUDY_STATUS) AS STUDY_STATUS_CNT /* 학습상태CNT */
+            FROM (
+                     SELECT DTL_CD
+                          , DTL_NM_KOR
+                     FROM TC_CD_DETAIL
+                     WHERE USE_YN = 'Y'
+                       AND MSTR_CD = 'FS_477'
+                 ) A /* 학습상태 코드 테이블 */
+                LEFT OUTER JOIN
+                (
+                    SELECT T1.*
+                         , CASE
+                            WHEN STUDY_RATE_AVG = 0 THEN (CASE WHEN EDU_END_DT <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 4 ELSE 1 END)
+                            WHEN STUDY_RATE_AVG <![CDATA[ > ]]> 0 AND STUDY_RATE_AVG <![CDATA[ < ]]> 100 THEN (CASE WHEN EDU_END_DT <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 4 ELSE 2 END)
+                            WHEN STUDY_RATE_AVG = 100 THEN 3
+                           END AS STUDY_STATUS /* 학습상태 */
+                     FROM (
+                              SELECT A.EDU_APLY_NO AS EDU_APLY_NO /* 교육신청번호 */
+                                   , MAX(TO_CHAR(A.EDU_APLY_DT, 'YYYY-MM-DD')) AS EDU_APLY_DT /* 교육신청일 */
+                                   , MAX(TO_CHAR(A.EDU_END_DT, 'YYYY-MM-DD')) AS EDU_END_DT /* 교육종료일 */
+                                   , MAX(A.EDU_ID) AS EDU_ID /* 교육ID */
+                                   , NVL(ROUND(SUM(B.STUDY_RATE) / DECODE(COUNT(B.ORD_NO), 0, null, COUNT(B.ORD_NO)), 2), 0)  AS STUDY_RATE_AVG /* 평균 진도율 */
+                                FROM COMM.TC_EDU_APLY A
+                                  LEFT OUTER JOIN COMM.TC_EDU_STATUS B
+                                      ON B.EDU_APLY_NO = A.EDU_APLY_NO
+                                     AND B.EDU_ID = A.EDU_ID
+                             WHERE A.EDU_APLY_ID = #{sessionUser.USER_ID}
+                               AND A.EDU_APLY_DT BETWEEN #{EDU_YEAR} || '-01-01' AND #{EDU_YEAR} || '-12-31'
+                            GROUP BY A.EDU_APLY_NO
+                          ) T1
+                ) B /* 교육신청자 학습상태 테이블 */
+                ON A.DTL_CD = B.STUDY_STATUS
+            GROUP BY A.DTL_CD, A.DTL_NM_KOR
+            ORDER BY DTL_CD
+    </select>
+
+
+    <!-- 나의 강의실 - 리스트 조회 -->
+    <select id="selectEduClassRoomList" resultType="myBatisBaseMap">
+        SELECT T2.*
+            , (SELECT COMM.FN_COMCODE_NM('FS_477', STUDY_STATUS) FROM DUAL) AS STUDY_STATUS_NM /* 학습상태명 */
+            FROM (
+                SELECT T1.*
+                     , CASE
+                        WHEN STUDY_RATE_AVG = 0 THEN (CASE WHEN EDU_END_DT <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 4 ELSE 1 END)
+                        WHEN STUDY_RATE_AVG <![CDATA[ > ]]> 0 AND STUDY_RATE_AVG <![CDATA[ < ]]> 100 THEN (CASE WHEN EDU_END_DT <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 4 ELSE 2 END)
+                        WHEN STUDY_RATE_AVG = 100 THEN 3
+                       END AS STUDY_STATUS /* 학습상태 */
+                 FROM (
+                        SELECT A.EDU_APLY_NO AS EDU_APLY_NO /* 교육신청번호 */
+                             , MAX(TO_CHAR(A.EDU_APLY_DT, 'YYYY-MM-DD')) AS EDU_APLY_DT /* 교육신청일 */
+                             , MAX(TO_CHAR(A.EDU_END_DT, 'YYYY-MM-DD')) AS EDU_END_DT /* 교육종료일 */
+                             , MAX(TRUNC(SYSDATE) - TO_DATE(TO_CHAR(A.EDU_END_DT, 'YYYY-MM-DD'), 'YYYY-MM-DD')) AS EDU_DT_DIFF /* 교육남은기간 */
+                             , MAX(B.EDU_ID) AS EDU_ID /* 교육ID */
+                             , MAX(B.EDU_TITLE) AS EDU_TITLE /* 교육명 */
+                             , MAX(B.EDU_GUBUN) AS EDU_GUBUN /* 교육구분 */
+                             , MAX((SELECT COMM.FN_COMCODE_NM('FS_446', EDU_GUBUN) FROM DUAL)) AS EDU_GUBUN_NM  /* 교육구분명 */
+                             , MAX(B.EDU_TIME) AS EDU_TIME /* 교육시간 */
+                             , COUNT(C.ORD_NO) AS EDU_CNT /* 강의차수 */
+                             , NVL(SUM(C.STUDY_RATE), 0) AS STUDY_RATE_TOT /* 진도율 합계 */
+                             , NVL(ROUND(SUM(C.STUDY_RATE) / DECODE(COUNT(C.ORD_NO), 0, null, COUNT(C.ORD_NO)), 2), 0)  AS STUDY_RATE_AVG /* 평균 진도율 */
+                          FROM COMM.TC_EDU_APLY A
+                            LEFT OUTER JOIN COMM.TC_EDU_PLAN B
+                                ON B.EDU_ID = A.EDU_ID
+                            LEFT OUTER JOIN COMM.TC_EDU_STATUS C
+                                ON C.EDU_APLY_NO = A.EDU_APLY_NO
+                               AND C.EDU_ID = A.EDU_ID
+                         WHERE A.EDU_APLY_ID = #{sessionUser.USER_ID}
+                           AND EDU_APLY_DT BETWEEN #{EDU_YEAR} || '-01-01' AND #{EDU_YEAR} || '-12-31'
+                            <if test='EDU_GUBUN != "" and EDU_GUBUN != null '><!-- 교육구분 -->
+                                AND EDU_GUBUN = #{EDU_GUBUN}
+                            </if>
+                            <if test='EDU_TITLE != "" and EDU_TITLE != null '><!-- 교육명 -->
+                                AND EDU_TITLE LIKE '%'||#{EDU_TITLE}||'%'
+                            </if>
+                        GROUP BY A.EDU_APLY_NO
+                      ) T1
+                ) T2
+         WHERE 1=1
+            <if test='STUDY_STATUS != "" and STUDY_STATUS != null '><!-- 학습상태 -->
+                AND STUDY_STATUS = #{STUDY_STATUS}
+            </if>
+        ORDER BY EDU_APLY_NO DESC
+    </select>
+
+
+    <!-- 나의 강의실 - 상세 조회 -->
+    <select id="selectEduClassRoomDetail" resultType="myBatisBaseMap">
+        SELECT T2.*
+                    , (SELECT COMM.FN_COMCODE_NM('FS_477', STUDY_STATUS) FROM DUAL) AS STUDY_STATUS_NM /* 학습상태명 */
+                    FROM (
+                        SELECT T1.*
+                             , CASE
+                                WHEN STUDY_RATE_AVG = 0 THEN (CASE WHEN EDU_END_DT <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 4 ELSE 1 END)
+                                WHEN STUDY_RATE_AVG <![CDATA[ > ]]> 0 AND STUDY_RATE_AVG <![CDATA[ < ]]> 100 THEN (CASE WHEN EDU_END_DT <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 4 ELSE 2 END)
+                                WHEN STUDY_RATE_AVG = 100 THEN 3
+                               END AS STUDY_STATUS /* 학습상태 */
+                         FROM (
+                                  SELECT A.EDU_APLY_NO AS EDU_APLY_NO /* 교육신청번호 */
+                                       , MAX(TO_CHAR(A.EDU_APLY_DT, 'YYYY-MM-DD')) AS EDU_APLY_DT /* 교육신청일 */
+                                       , MAX(TO_CHAR(A.EDU_END_DT, 'YYYY-MM-DD')) AS EDU_END_DT /* 교육종료일 */
+                                       , MAX(TRUNC(SYSDATE) - TO_DATE(TO_CHAR(A.EDU_END_DT, 'YYYY-MM-DD'), 'YYYY-MM-DD')) AS EDU_DT_DIFF /* 교육남은기간 */
+                                       , MAX(B.EDU_ID) AS EDU_ID /* 교육ID */
+                                       , MAX(B.EDU_TITLE) AS EDU_TITLE /* 교육명 */
+                                       , MAX(B.EDU_GUBUN) AS EDU_GUBUN /* 교육구분 */
+                                       , MAX((SELECT COMM.FN_COMCODE_NM('FS_446', EDU_GUBUN) FROM DUAL)) AS EDU_GUBUN_NM  /* 교육구분명 */
+                                       , MAX(B.EDU_TIME) AS EDU_TIME /* 교육시간 */
+                                       , COUNT(C.ORD_NO) AS EDU_CNT /* 강의차수 */
+                                       , NVL(SUM(C.STUDY_RATE), 0) AS STUDY_RATE_TOT /* 진도율 합계 */
+                                       , NVL(ROUND(SUM(C.STUDY_RATE) / DECODE(COUNT(C.ORD_NO), 0, null, COUNT(C.ORD_NO)), 2), 0)  AS STUDY_RATE_AVG /* 평균 진도율 */
+                                       , MAX(A.EDU_CERT_NO) AS EDU_CERT_NO /* 교육 이수증 */
+                                       , A.GBN
+                                    FROM COMM.TC_EDU_APLY A
+                                      LEFT OUTER JOIN COMM.TC_EDU_PLAN B
+                                          ON B.EDU_ID = A.EDU_ID
+                                      LEFT OUTER JOIN COMM.TC_EDU_STATUS C
+                                          ON C.EDU_APLY_NO = A.EDU_APLY_NO
+                                         AND C.EDU_ID = A.EDU_ID
+                                 WHERE A.EDU_APLY_NO = #{EDU_APLY_NO}
+                                   AND A.EDU_ID = #{EDU_ID}
+                                GROUP BY A.EDU_APLY_NO, A.GBN
+                              ) T1
+                        ) T2
+    </select>
+
+
+    <!-- 강의 - 리스트 조회 -->
+    <select id="selectEduClassStatusList" resultType="MyBatisBaseMap">
+        SELECT ROWNUM AS RNUM
+             , A.EDU_APLY_NO /* 교육신청번호 */
+             , A.EDU_ID /* 교육ID */
+             , A.ORD_NO /* 강의순번 */
+             , B.CLASS_ORD /* 학습 차시 */
+             , B.CLASS_TIME /* 총 강의시간 */
+             , B.TITLE /* 강의명 */
+             , B.ATTACH_FILE_ID /* 첨부파일ID */
+             , NVL(A.STUDY_RATE, 0) AS STUDY_RATE /* 학습 진도율 */
+             , NVL(TO_CHAR(TRUNC(SYSDATE) + NUMTODSINTERVAL(A.STUDY_TIME, 'second'),'hh24:mi:ss'), '00:00:00') AS STUDY_TIME /* 학습시간(시:분:초) */
+             , TO_CHAR(A.STUDY_START_DT, 'YYYY-MM-DD HH24:MI:SS') AS STUDY_START_DT /* 학습시작일 */
+             , TO_CHAR(A.STUDY_END_DT, 'YYYY-MM-DD HH24:MI:SS') AS STUDY_END_DT /* 학습종료일 */
+          FROM COMM.TC_EDU_STATUS A
+            LEFT OUTER JOIN COMM.TC_EDU_BOARD_DATA B
+                ON B.EDU_BOARD_ID = 'EDUBOARD002' /* 강의게시판ID */
+               AND B.EDU_ID = A.EDU_ID
+               AND B.ORD_NO = A.ORD_NO
+         WHERE 1=1
+           AND A.EDU_APLY_NO = #{EDU_APLY_NO}
+           AND A.EDU_ID = #{EDU_ID}
+        ORDER BY CLASS_ORD
+    </select>
+
+
+    <!-- 강의 - 상세 조회 -->
+    <select id="selectEduClassStatusData" resultType="MyBatisBaseMap">
+        SELECT ROWNUM AS RNUM
+             , A.EDU_APLY_NO /* 교육신청번호 */
+             , A.EDU_ID /* 교육ID */
+             , C.EDU_TITLE /* 교육명 */
+             , TO_CHAR(A.STUDY_START_DT, 'YYYY-MM-DD') AS STUDY_START_DT /* 학습시작일 */
+             , TO_CHAR(A.STUDY_END_DT, 'YYYY-MM-DD') AS STUDY_END_DT /* 학습종료일 */
+             , C.EDU_TIME /* 교육시간 */
+             , (SELECT COUNT(ORD_NO) FROM TC_EDU_BOARD_DATA WHERE USE_YN = 'Y' AND EDU_BOARD_ID = 'EDUBOARD002' AND EDU_ID = #{EDU_ID}) AS ORD_CNT /* 총학습차시 */
+             , A.ORD_NO /* 강의순번 */
+             , B.CLASS_ORD /* 학습 차시 */
+             , B.TITLE /* 강의명 */
+             , B.ATTACH_FILE_ID /* 첨부파일ID */
+             , A.STUDY_TIME /* 학습시간(초) */
+             , A.GBN
+          FROM COMM.TC_EDU_STATUS A
+            LEFT OUTER JOIN COMM.TC_EDU_BOARD_DATA B
+                ON B.EDU_BOARD_ID = 'EDUBOARD002' /* 강의게시판ID */
+               AND B.EDU_ID = A.EDU_ID
+               AND B.ORD_NO = A.ORD_NO
+            LEFT OUTER JOIN COMM.TC_EDU_PLAN C
+                ON C.EDU_ID = A.EDU_ID
+         WHERE 1=1
+           AND A.EDU_APLY_NO = #{EDU_APLY_NO}
+           AND A.EDU_ID = #{EDU_ID}
+           AND A.ORD_NO = #{ORD_NO}
+        ORDER BY CLASS_ORD
+    </select>
+
+
+    <!-- 강의 학습하기 - 진도 체크 -->
+    <update id="saveStudyTime">
+        MERGE
+            INTO COMM.TC_EDU_STATUS A
+                USING DUAL
+                ON (A.EDU_APLY_NO = #{EDU_APLY_NO} AND EDU_ID = #{EDU_ID} AND ORD_NO = #{ORD_NO})
+                WHEN MATCHED THEN
+                    UPDATE
+                        SET A.STUDY_START_DT = NVL(A.STUDY_START_DT, SYSDATE)
+                          , A.STUDY_END_DT = SYSDATE
+                          , A.STUDY_TIME = CASE WHEN A.STUDY_TIME <![CDATA[ < ]]> TO_NUMBER(#{STUDY_TIME})
+                                            THEN TO_NUMBER(#{STUDY_TIME})
+                                            ELSE A.STUDY_TIME
+                                           END /* 기존 학습시간보다 더 클 경우 UPDATE */
+                          , A.STUDY_RATE = CASE WHEN A.STUDY_RATE <![CDATA[ < ]]> TO_NUMBER(#{STUDY_RATE})
+                                            THEN TO_NUMBER(#{STUDY_RATE})
+                                            ELSE A.STUDY_RATE
+                                           END /* 기존 진도율보다 더 클 경우 UPDATE */
+                          , A.STUDY_CHECKTIME= #{STUDY_CHECKTIME}
+                WHEN NOT MATCHED THEN
+                    INSERT (A.EDU_APLY_NO, A.EDU_ID, A.ORD_NO, A.STUDY_START_DT, A.STUDY_END_DT, A.STUDY_TIME, A.STUDY_RATE, A.STUDY_CHECKTIME, A.GBN)
+                        VALUES (#{EDU_APLY_NO}, #{EDU_ID}, #{ORD_NO}, SYSDATE, SYSDATE, 0, 0, #{STUDY_CHECKTIME}, #{GBN})
+    </update>
+
+
+    <!-- 교육이수증 - 상세 조회 -->
+    <select id="selectEduCertInfo" resultType="myBatisBaseMap">
+        SELECT EDU_CERT_NO /* 교육이수증번호 */
+             , TO_CHAR(EDU_CERT_DT, 'YYYY-MM-DD') AS EDU_CERT_DT /* 교육이수일 */
+             , EDU_APLY_NO /* 교육신청번호 */
+             , EDU_APLY_ID /* 아이디 */
+             , EDU_ID /* 교육ID */
+             , CERT_NO /* 친환경인증번호 */
+             , COMP_NM_KOR /* 업체명 */
+             , CEO_NM_KOR /* 대표자 */
+             , REGEXP_REPLACE(BIZ_REG_NO, '(.{3})(.+)(.{5})', '\1-\2-\3') AS BIZ_REG_NO /* 사업자번호 */
+             , COMP_ZIPCD_ST /* 업체 우편번호 */
+             , COMP_ADDR1_ST /* 업체 주소 */
+             , COMP_ADDR2_ST /* 업체 상세주소 */
+             , EDU_APLY_NM /* 교육 신청자 성명 */
+             , COMM.PKG_ENCRYPT.DECRYPT_DATA(EDU_APLY_BIRTH) AS EDU_APLY_BIRTH /* 교육 신청자 생년원일 */
+             , EDU_APLY_WORK /* 교육 신청자 담당업무  */
+             , (SELECT COMM.FN_COMCODE_NM('FS_467', EDU_APLY_WORK) FROM DUAL) AS EDU_APLY_WORK_NM
+          FROM COMM.TC_EDU_APLY
+         WHERE EDU_CERT_NO = #{EDU_CERT_NO}
+    </select>
+
+    <!-- 교육이수증 - 상세 조회 -->
+    <select id="selectEduCertHaccpInfo" resultType="myBatisBaseMap">
+        SELECT EDU_CERT_NO /* 교육이수증번호 */
+             , TO_CHAR(EDU_CERT_DT, 'YYYY-MM-DD') AS EDU_CERT_DT /* 교육이수일 */
+             , EDU_APLY_NO /* 교육신청번호 */
+             , EDU_APLY_ID /* 아이디 */
+             , EDU_ID /* 교육ID */
+             , CERT_NO /* 친환경인증번호 */
+             , COMP_NM_KOR /* 업체명 */
+             , CEO_NM_KOR /* 대표자 */
+             , REGEXP_REPLACE(BIZ_REG_NO, '(.{3})(.+)(.{5})', '\1-\2-\3') AS BIZ_REG_NO /* 사업자번호 */
+             , COMP_ZIPCD_ST /* 업체 우편번호 */
+             , COMP_ADDR1_ST /* 업체 주소 */
+             , COMP_ADDR2_ST /* 업체 상세주소 */
+             , EDU_APLY_NM /* 교육 신청자 성명 */
+             , COMM.PKG_ENCRYPT.DECRYPT_DATA(EDU_APLY_BIRTH) AS EDU_APLY_BIRTH /* 교육 신청자 생년원일 */
+             , EDU_APLY_WORK /* 교육 신청자 담당업무  */
+             , (SELECT COMM.FN_COMCODE_NM('FS_542', EDU_APLY_WORK) FROM DUAL) AS EDU_APLY_WORK_NM
+          FROM COMM.TC_EDU_APLY
+         WHERE EDU_CERT_NO = #{EDU_CERT_NO}
+    </select>
+
+
+    <!-- 교육 이수증 - 발급 -->
+    <insert id="saveEduCertInfo">
+        <selectKey resultType="string" keyProperty="EDU_CERT_NO" order="BEFORE">
+            SELECT TO_CHAR(SYSDATE, 'YYYY')
+                || '-' || LPAD(#{EDU_GUBUN}, 2, '0')
+                || '-' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(EDU_CERT_NO, 9, LENGTH(EDU_APLY_NO)))), 0) + 1, 4, '0') AS EDU_CERT_NO
+              FROM COMM.TC_EDU_APLY A, COMM.TC_EDU_PLAN B
+             WHERE A.EDU_ID = B.EDU_ID
+               AND TO_CHAR(EDU_CERT_DT, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+               AND B.EDU_GUBUN = #{EDU_GUBUN}
+               AND B.EDU_ID=#{EDU_ID}
+        </selectKey>
+        UPDATE COMM.TC_EDU_APLY
+           SET EDU_CERT_NO = #{EDU_CERT_NO}
+             , EDU_CERT_DT = SYSDATE
+        WHERE EDU_APLY_NO = #{EDU_APLY_NO}
+
+    </insert>
+
+
+    <!-- 교육 참여현황 - 리스트 조회 -->
+    <select id="selectEduStatusList" resultType="MyBatisBaseMap">
+        <include refid="IncludeSql.paging-start"></include>
+        SELECT T2.*
+             , (SELECT COMM.FN_COMCODE_NM('FS_477', STUDY_STATUS) FROM DUAL) AS STUDY_STATUS_NM /* 학습상태명 */
+             FROM (
+                 SELECT T1.*
+                      , CASE
+                         WHEN STUDY_RATE_AVG = 0 THEN (CASE WHEN EDU_END_DT <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 4 ELSE 1 END)
+                         WHEN STUDY_RATE_AVG <![CDATA[ > ]]> 0 AND STUDY_RATE_AVG <![CDATA[ < ]]> 100 THEN (CASE WHEN EDU_END_DT <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 4 ELSE 2 END)
+                         WHEN STUDY_RATE_AVG = 100 THEN 3
+                        END AS STUDY_STATUS /* 학습상태 */
+                  FROM (
+                         SELECT A.EDU_APLY_NO AS EDU_APLY_NO /* 교육신청번호 */
+                              , MAX(TO_CHAR(A.EDU_APLY_DT, 'YYYY-MM-DD')) AS EDU_APLY_DT /* 교육신청일 */
+                              , MAX(TO_CHAR(A.EDU_END_DT, 'YYYY-MM-DD')) AS EDU_END_DT /* 교육종료일 */
+                              , A.CERT_NO AS CERT_NO /*HACCP 등록번호만*/
+                              , MAX(B.EDU_ID) AS EDU_ID /* 교육ID */
+                              , MAX(B.EDU_TITLE) AS EDU_TITLE /* 교육명 */
+                              , MAX(B.EDU_GUBUN) AS EDU_GUBUN /* 교육구분 */
+                              , MAX((SELECT COMM.FN_COMCODE_NM('FS_446', EDU_GUBUN) FROM DUAL)) AS EDU_GUBUN_NM  /* 교육구분명 */
+                              , NVL(ROUND(SUM(C.STUDY_RATE) / DECODE(COUNT(C.ORD_NO), 0, null, COUNT(C.ORD_NO)), 2), 0)  AS STUDY_RATE_AVG /* 평균 진도율 */
+                              , MIN(TO_CHAR(C.STUDY_START_DT, 'YYYY-MM-DD')) AS STUDY_START_DT /* 학습시작일 */
+                              , MAX(TO_CHAR(C.STUDY_END_DT, 'YYYY-MM-DD')) AS STUDY_END_DT /* 학습종료일 */
+                              , MAX(A.EDU_CERT_NO) AS EDU_CERT_NO /* 교육이수증번호 */
+                              , A.GBN
+                           FROM COMM.TC_EDU_APLY A
+                             LEFT OUTER JOIN COMM.TC_EDU_PLAN B
+                                 ON B.EDU_ID = A.EDU_ID
+                             LEFT OUTER JOIN COMM.TC_EDU_STATUS C
+                                 ON C.EDU_APLY_NO = A.EDU_APLY_NO
+                                AND C.EDU_ID = A.EDU_ID
+                          WHERE 1=1
+                            AND A.EDU_APLY_DT BETWEEN #{EDU_YEAR} || '-01-01' AND #{EDU_YEAR} || '-12-31'
+                            <if test='sessionUser.USER_TYPE == "5"'><!-- 업체대표자 -->
+                                AND REPLACE(A.BIZ_REG_NO, '-', '') = REPLACE(#{certUserMap.BIZ_REG_NO}, '-', '')
+                            </if>
+                            <if test='sessionUser.USER_TYPE != "5"'>
+                                AND A.EDU_APLY_ID = #{sessionUser.USER_ID}
+                            </if>
+                            <if test='EDU_GUBUN != "" and EDU_GUBUN != null '><!-- 교육구분 -->
+                                AND EDU_GUBUN = #{EDU_GUBUN}
+                            </if>
+                            <if test='EDU_TITLE != "" and EDU_TITLE != null '><!-- 교육명 -->
+                                AND EDU_TITLE LIKE '%'||#{EDU_TITLE}||'%'
+                            </if>
+                         GROUP BY A.EDU_APLY_NO, A.GBN, A.CERT_NO
+                       ) T1
+                 ) T2
+          WHERE 1=1
+            <if test='STUDY_STATUS != "" and STUDY_STATUS != null '><!-- 학습상태 -->
+                AND STUDY_STATUS = #{STUDY_STATUS}
+            </if>
+        ORDER BY EDU_APLY_DT DESC
+        <include refid="IncludeSql.paging-end"></include>
+    </select>
+
+
+    <!-- 교육 게시판 관리 - 상세 조회 -->
+    <select id="selectEduBoardInfo" resultType="MyBatisBaseMap">
+        SELECT EDU_BOARD_ID  /* 교육 게시판 ID */
+             , EDU_BOARD_TITLE  /* 교육 게시판 명 */
+             , EDU_BOARD_TYPE  /* 교육 게시판 타입 */
+             , ATTACH_FILE_AT /* 첨부파일 여부 */
+             , USE_YN  /* 사용여부 */
+             , SECRET_AT /* 비밀글 여부 */
+             , ANONYMOUS_AT /* 익명글 여부 */
+        FROM COMM.TC_EDU_BOARD_MNG A
+        WHERE EDU_BOARD_ID = #{EDU_BOARD_ID}
+    </select>
+
+
+    <!-- 교육 게시판 - 리스트 조회 -->
+    <select id="selectEduBoardList" resultType="MyBatisBaseMap">
+        <include refid="IncludeSql.paging-start"></include>
+        SELECT EDU_BOARD_ID /* 게시판ID */
+             , EDU_ID  /* 교육 ID */
+             , ORD_NO /* 게시글 순번 */
+             , TITLE /* 제목 */
+             , NVL(LOCKUP_CNT, 0) AS LOCKUP_CNT /* 조회수 */
+             , ATTACH_FILE_ID /* 첨부파일ID */
+             , NVL2(ATTACH_FILE_ID,'Y','N') AS ATTACH_FILE_AT /*첨부파일 등록 여부 */
+             , UPPER_ORD_NO /* 상위 게시글 순번 */
+             , USE_YN /* 사용여부 */
+             , TEXT_PASSWORD /* 비밀번호 */
+             , NVL2(NVL2(UPPER_ORD_NO, (SELECT TEXT_PASSWORD FROM COMM.TC_EDU_BOARD_DATA S WHERE S.EDU_BOARD_ID = A.EDU_BOARD_ID AND S.EDU_ID = A.EDU_ID AND S.ORD_NO = A.UPPER_ORD_NO), TEXT_PASSWORD), 'Y', 'N') AS PASSWORD_AT /* 비밀번호 여부 */
+             , REG_ID /* 등록자ID */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.REG_ID) AS REG_NM  /* 등록자이름 */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT/* 등록일시 */
+             , '1' AS LV
+          FROM COMM.TC_EDU_BOARD_DATA A
+         WHERE USE_YN = 'Y'
+           AND EDU_BOARD_ID = #{EDU_BOARD_ID}
+           AND EDU_ID = #{EDU_ID}
+            <if test='TITLE != "" and TITLE != null '> <!--글제목 -->
+                AND TITLE LIKE '%'||#{TITLE}||'%'
+            </if>
+            <if test='REG_NM != "" and REG_NM != null '> <!--작성자 -->
+                AND EXISTS  (SELECT 'O'
+                FROM TC_USER_INFO E
+                WHERE E.USER_ID = A.REG_ID)
+            </if>
+        ORDER BY CLASS_ORD, ORD_NO
+        <include refid="IncludeSql.paging-end"></include>
+    </select>
+
+
+    <!-- 교육 게시판(답변형) - 리스트 조회 -->
+    <select id="selectEduBoardAnswerList" resultType="MyBatisBaseMap">
+        <include refid="IncludeSql.paging-start"></include>
+        SELECT EDU_BOARD_ID /* 게시판ID */
+             , EDU_ID  /* 교육 ID */
+             , ORD_NO /* 게시글 순번 */
+             , TITLE /* 제목 */
+             , NVL(LOCKUP_CNT, 0) AS LOCKUP_CNT /* 조회수 */
+             , ATTACH_FILE_ID /* 첨부파일ID */
+             , NVL2(ATTACH_FILE_ID,'Y','N') AS ATTACH_FILE_AT /*첨부파일 등록 여부 */
+             , UPPER_ORD_NO /* 상위 게시글 순번 */
+             , USE_YN /* 사용여부 */
+             , TEXT_PASSWORD /* 비밀번호 */
+             , NVL2(NVL2(UPPER_ORD_NO, (SELECT TEXT_PASSWORD FROM COMM.TC_EDU_BOARD_DATA S WHERE S.EDU_BOARD_ID = A.EDU_BOARD_ID AND S.EDU_ID = A.EDU_ID AND S.ORD_NO = A.UPPER_ORD_NO), TEXT_PASSWORD), 'Y', 'N') AS PASSWORD_AT /* 비밀번호 여부 */
+             , REG_ID /* 등록자ID */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.REG_ID) AS REG_NM  /* 등록자이름 */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT/* 등록일시 */
+             , TO_CHAR(LEVEL) AS LV
+          FROM TC_EDU_BOARD_DATA A
+         WHERE USE_YN = 'Y'
+           AND EDU_BOARD_ID = #{EDU_BOARD_ID}
+           AND EDU_ID = #{EDU_ID}
+            <if test='TITLE != "" and TITLE != null '> <!--글제목 -->
+                AND TITLE LIKE '%'||#{TITLE}||'%'
+            </if>
+            <if test='REG_NM != "" and REG_NM != null '> <!--작성자 -->
+                AND EXISTS  (SELECT 'O'
+                FROM TC_USER_INFO E
+                WHERE E.USER_ID = A.REG_ID)
+            </if>
+        START WITH UPPER_ORD_NO IS NULL
+               AND EDU_BOARD_ID = #{EDU_BOARD_ID}
+               AND EDU_ID = #{EDU_ID}
+               AND DEL_DT IS NULL
+        CONNECT BY PRIOR ORD_NO = UPPER_ORD_NO
+                     AND EDU_BOARD_ID = #{EDU_BOARD_ID}
+                     AND EDU_ID = #{EDU_ID}
+                     AND DEL_DT IS NULL
+        ORDER SIBLINGS BY NOTICE_YN DESC, A.ORD_NO DESC
+        <include refid="IncludeSql.paging-end"></include>
+    </select>
+
+
+    <!-- 교육 게시글 - 상세 조회 -->
+    <resultMap id="getEduBoardDataMap" type="HashMap">
+        <result property="DES" column="DES" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+
+    <select id="selectEduBoardDetail" resultMap="getEduBoardDataMap">
+        SELECT EDU_BOARD_ID  /* 교육 게시판 ID */
+             , EDU_ID  /* 교육 ID */
+             , ORD_NO  /* 게시글 순번 */
+             , TITLE  /* 제목 */
+             , DES  /* 내용 */
+             , DES_TEXT  /* 내용 요약 */
+             , NVL(A.LOCKUP_CNT,0) AS LOCKUP_CNT/* 조회수 */
+             , ATTACH_FILE_ID  /* 첨부파일ID */
+             , NOTICE_YN  /* 공지여부 */
+             , POST_PRD_FROM_DT  /* 게시기간 시작 */
+             , POST_PRD_TO_DT  /* 게시기간 종료 */
+             , UPPER_ORD_NO  /* 상위 게시글 순번 */
+             , USE_YN  /* 사용여부 */
+             , TEXT_PASSWORD  /* 비밀번호 */
+             , NVL2(NVL2(UPPER_ORD_NO,(SELECT TEXT_PASSWORD FROM COMM.TC_EDU_BOARD_DATA S WHERE S.EDU_BOARD_ID = A.EDU_BOARD_ID AND S.EDU_ID = A.EDU_ID AND S.ORD_NO = A.UPPER_ORD_NO),TEXT_PASSWORD), 'Y', 'N') AS PASSWORD_AT /* 비밀번호 여부 */
+             , REG_ID /* 등록자ID */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.REG_ID) AS REG_NM  /* 등록자 이름 */
+             , TO_CHAR(REG_DT, 'YYYY-MM-DD') AS REG_DT /* 등록일 */
+        FROM TC_EDU_BOARD_DATA A
+        WHERE EDU_BOARD_ID = #{EDU_BOARD_ID}
+          AND EDU_ID = #{EDU_ID}
+          AND ORD_NO = #{ORD_NO}
+    </select>
+
+
+    <!-- 교육 게시글 - 조회수 count -->
+    <update id="increaseEduBoardLockupCnt">
+        UPDATE COMM.TC_EDU_BOARD_DATA
+        SET LOCKUP_CNT = NVL(LOCKUP_CNT,0) + 1
+        WHERE EDU_BOARD_ID = #{EDU_BOARD_ID}
+          AND EDU_ID = #{EDU_ID}
+          AND ORD_NO = #{ORD_NO}
+    </update>
+
+
+    <!-- 교육 게시글 - 등록 -->
+    <insert id="insertEduBoardData">
+        <selectKey resultType="string" keyProperty="ORD_NO" order="BEFORE">
+            (SELECT NVL(MAX(ORD_NO),0)+1 FROM COMM.TC_EDU_BOARD_DATA  WHERE EDU_BOARD_ID = #{EDU_BOARD_ID} AND EDU_ID = #{EDU_ID} )
+        </selectKey>
+
+        INSERT INTO COMM.TC_EDU_BOARD_DATA
+        (  EDU_BOARD_ID  /* 교육 게시판 ID */
+         , EDU_ID  /* 교육 ID */
+         , ORD_NO  /* 게시글 순번 */
+         , TITLE /* 제목 */
+         , DES /* 내용 */
+         , LOCKUP_CNT /* 조회수 */
+         , ATTACH_FILE_ID /* 첨부파일ID */
+         , TEXT_PASSWORD /* 게시글비밀번호 */
+         , USE_YN /* 사용여부 */
+         , REG_DT /* 등록일시 */
+         , REG_ID /* 등록자ID */
+        )
+        VALUES
+        (  #{EDU_BOARD_ID}  /* 교육 게시판 ID */
+         , #{EDU_ID}  /* 교육 ID */
+         , #{ORD_NO}  /* 게시글 순번 */
+         , #{TITLE} /* 제목 */
+         , #{DES_CK} /* 내용 */
+         , 0 /* 조회수 */
+         , #{ATTACH_FILE_ID} /* 첨부파일ID */
+         , #{TEXT_PASSWORD} /* 게시글비밀번호 */
+         , 'Y' /* 사용여부 */
+         , SYSDATE /* YYYY-MM-DD HH:MM:SS 타입(일시), 최초 자료등록일시 */
+         , #{sessionUser.USER_ID}
+        )
+    </insert>
+
+
+    <!-- 교육 게시글 - 수정  -->
+    <update id="updateEduBoardData">
+        UPDATE COMM.TC_EDU_BOARD_DATA
+           SET TITLE = #{TITLE} /* 제목 */
+             , DES = #{DES_CK} /* 내용 */
+             , ATTACH_FILE_ID = CASE WHEN (SELECT COUNT(*) FROM TC_ATCH_FILE WHERE FILE_ID = #{ATTACH_FILE_ID}) = 0 THEN '' ELSE #{ATTACH_FILE_ID} END /* 첨부파일ID */
+             , TEXT_PASSWORD = #{TEXT_PASSWORD}
+             , UPD_DT = SYSDATE  /* YYYY-MM-DD HH:MM:SS 타입(일시), 최근 자료수정일 */
+             , UPD_ID = #{sessionUser.USER_ID}  /* 게시판 관리ID, 최근 자료 수정자ID, */
+         WHERE EDU_BOARD_ID = #{EDU_BOARD_ID}
+           AND EDU_ID = #{EDU_ID}
+           AND ORD_NO = #{ORD_NO}
+    </update>
+
+
+    <!-- 교육 게시글 - 삭제 -->
+    <update id="deleteEduBoardData">
+        UPDATE COMM.TC_EDU_BOARD_DATA
+           SET USE_YN = 'N'
+             , DEL_DT = SYSDATE /* YYYY-MM-DD HH:MM:SS 타입(일시), 자료 삭제일 */
+             , DEL_ID = 'admin'  /* 게시판 관리ID, 자료 삭제자 ID */
+         WHERE EDU_BOARD_ID = #{EDU_BOARD_ID}
+           AND EDU_ID = #{EDU_ID}
+           AND ORD_NO = #{ORD_NO}
+    </update>
+
+
+    <!-- 교육 게시글 - 비밀번호 조회 -->
+    <select id="selectCheckEduBoardPassword" resultType="string">
+        SELECT *
+        FROM (
+                 SELECT NVL2(UPPER_ORD_NO, (SELECT TEXT_PASSWORD
+                                            FROM COMM.TC_EDU_BOARD_DATA S
+                                            WHERE S.EDU_BOARD_ID = A.EDU_BOARD_ID
+                                              AND S.EDU_ID = A.EDU_ID
+                                              AND S.ORD_NO = A.UPPER_ORD_NO),
+                             TEXT_PASSWORD) AS TEXT_PASSWORD
+                 FROM COMM.TC_EDU_BOARD_DATA A
+                 WHERE EDU_BOARD_ID = #{EDU_BOARD_ID}
+                   AND EDU_ID = #{EDU_ID}
+                   AND ORD_NO = #{ORD_NO}
+             )
+        WHERE TEXT_PASSWORD = #{TEXT_PASSWORD}
+    </select>
+
+
+    <!-- 친환경교육 - 문자 발송 -->
+   <insert id="insertEduSms">
+       <selectKey keyProperty="IDX" resultType="int" order="BEFORE">
+           SELECT NURI.NURI_SEQ.NEXTVAL AS NEW_MSG_SEQ FROM DUAL
+       </selectKey>
+       INSERT INTO NURI.NURI_TEMP (
+                NURI_SEQ
+              , SCE_SYS_CD
+              , SCE_SYS_DIV
+              , MSG_TYPE
+              , CALL_TO
+              , CALL_FROM
+              , MSG_TITLE
+              , MSG_CONT
+              , REG_TM
+          )  VALUES (
+                #{IDX}
+              , '22'
+              , 'OGE'
+              , '4'
+              , REPLACE(#{CALLNUM}, '-', '') /*받는사람*/
+              , REPLACE(#{CALLBACK}, '-', '') /*보내는사람*/
+              , #{TITLE} /*제목*/
+              , #{MSG} /*메세지*/
+              , SYSDATE
+          )
+   </insert>
+   <!-- <insert id="insertEduSms">
+       <selectKey keyProperty="IDX" resultType="int" order="BEFORE">
+           SELECT SMS_TEMP_SEQ.NEXTVAL@ORA_NFPIS_WEB FROM DUAL
+       </selectKey>
+       INSERT INTO SMS_TEMP@ORA_NFPIS_WEB (
+                IDX
+              , TRAN_DIV
+              , TRAN_CALLBACK /*보내는사람*/
+              , TRAN_CALLNUM /*받는사람*/
+              , TRAN_TITLE /*제목*/
+              , TRAN_MSG /*메세지*/
+              , TRAN_DATE
+              , TRAN_SEND_DATE /* 삭제 */
+          )  VALUES (
+                #{IDX}
+              , 'FSM'
+              , REPLACE(#{CALLBACK}, '-', '') /*보내는사람*/
+              , REPLACE(#{CALLNUM}, '-', '') /*받는사람*/
+              , #{TITLE} /*제목*/
+              , #{MSG} /*메세지*/
+              , SYSDATE
+              , SYSDATE /* 삭제 */
+          )
+   </insert> -->
+
+    <select id="checkStudyTime" resultType="myBatisBaseMap">
+        SELECT STUDY_TIME, STUDY_RATE, STUDY_CHECKTIME FROM TC_EDU_STATUS
+        WHERE EDU_APLY_NO = #{EDU_APLY_NO}
+              AND EDU_ID = #{EDU_ID}
+              AND ORD_NO = #{ORD_NO}
+    </select>
+
+    <select id="checkStudyRate" resultType="double">
+        SELECT CASE WHEN #{STUDY_TIME} <![CDATA[ > ]]> TO_NUMBER(CLASS_TIME_SS)-30 THEN 100
+                    ELSE ROUND(#{STUDY_TIME} / TO_NUMBER(CLASS_TIME_SS) * 100, 2)
+                   END AS STUDY_RATE
+        FROM (
+                 SELECT CLASS_TIME
+                      , SUBSTR(CLASS_TIME, 1, 2)*60 + SUBSTR(CLASS_TIME, INSTR(CLASS_TIME, ':')+1, 2) AS CLASS_TIME_SS
+                 FROM TC_EDU_BOARD_DATA
+                 WHERE EDU_BOARD_ID = 'EDUBOARD002'
+                   AND EDU_ID = #{EDU_ID}
+                   AND ORD_NO = #{ORD_NO}
+             ) T1
+    </select>
+
+    <!-- 교육 신청자 담당업무 - 사용자 정의 코드 -->
+    <select id="selectEduApplyHaccpWorkOptions" resultType="MyBatisBaseMap">
+        SELECT B.MSTR_CD
+             , B.DTL_CD AS CD
+             , B.DTL_NM_KOR AS CD_NM
+         FROM TC_CD_MASTER A
+            , TC_CD_DETAIL B
+        WHERE A.MSTR_CD = B.MSTR_CD
+          AND A.MSTR_CD IN
+            <foreach collection="MSTR_CD" item="item"  index="index"  open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+          AND A.USE_YN = 'Y'
+          AND B.USE_YN = 'Y'
+        ORDER BY B.MSTR_CD, B.SORT_SEQ
+    </select>
+
+    <!--HACCP 교육 이수증 - 발급 -->
+    <insert id="saveEduCertHaccpInfo">
+        <selectKey resultType="string" keyProperty="EDU_CERT_NO" order="BEFORE">
+            SELECT TO_CHAR(SYSDATE, 'YYYY')
+                || '-' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(EDU_CERT_NO, 9, LENGTH(EDU_APLY_NO)))), 0) + 1, 4, '0') AS EDU_CERT_NO
+              FROM COMM.TC_EDU_APLY A, COMM.TC_EDU_PLAN B
+             WHERE A.EDU_ID = B.EDU_ID
+               AND TO_CHAR(EDU_CERT_DT, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+               AND B.EDU_GUBUN = #{EDU_GUBUN}
+               AND B.EDU_ID=#{EDU_ID}
+        </selectKey>
+        UPDATE COMM.TC_EDU_APLY
+           SET EDU_CERT_NO = #{EDU_CERT_NO}
+             , EDU_CERT_DT = SYSDATE
+        WHERE EDU_APLY_NO = #{EDU_APLY_NO}
+
+    </insert>
+
+    <select id="duplicateCheck" resultType="int">
+        SELECT COUNT(*) FROM TC_EDU_APLY WHERE EDU_ID=#{EDU_ID} AND EDU_APLY_ID=#{sessionUser.USER_ID} AND SUBSTR(EDU_APLY_NO, 0, 4) = TO_CHAR(SYSDATE, 'YYYY')
+    </select>
+
+</mapper>

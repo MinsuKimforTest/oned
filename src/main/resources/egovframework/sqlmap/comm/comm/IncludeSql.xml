@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- <include refid="IncludeSql.paging-start"/> -->
+	<!-- SQL문 -->
+<!-- <include refid="IncludeSql.paging-end"/> -->
+
+<mapper namespace="IncludeSql">
+	<sql id="paging-start">
+		SELECT  T.*
+		FROM(
+			SELECT ROWNUM RNUM
+				 , COUNT(*) OVER () ALL_CNT
+				 , XX.*
+			FROM(
+	</sql>
+	<sql id="paging-end">
+			)XX
+		)T
+		WHERE RNUM BETWEEN #{startIdx} AND #{endIdx}
+	</sql>
+</mapper>

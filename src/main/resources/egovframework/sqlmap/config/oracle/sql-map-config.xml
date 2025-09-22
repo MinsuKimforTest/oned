@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+    <typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+    <typeAlias alias="myBatisBaseMap" type="fsm.oned.comm.MyBatisBaseMap"/>
+	<sqlMap resource="egovframework/sqlmap/comm/comm/flicCommonFileSQL.xml"/>
+    <sqlMap resource="egovframework/sqlmap/comm/comm/privacyLogSQL.xml"/>
+    
+</sqlMapConfig>

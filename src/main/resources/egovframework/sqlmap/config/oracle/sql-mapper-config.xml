@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+
+<configuration>
+    <settings>
+        <setting name="callSettersOnNulls" value="true"/> <!-- 리턴 컬럼 데이터가 NULL 일때 Map 키값에 NULL 세팅해줌 -->
+         <setting name="jdbcTypeForNull" value="NULL" /> <!-- parameterType 에 없는 컬럼이 넘어올때 NULL 로 세팅해줌 -->
+    </settings>
+    <typeAliases>
+        <typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+        <typeAlias alias="myBatisBaseMap" type="fsm.oned.comm.MyBatisBaseMap"/>
+    </typeAliases>
+</configuration>
+

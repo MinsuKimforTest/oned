@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Backup/Extended SQL: Parameterized to avoid hardcoding GBN/EDU_BOARD_ID -->
+<mapper namespace="fsm.oned.edu.mapper.EduMapperExt">
+
+    <!-- 교육신청 리스트 (GBN 파라미터) -->
+    <select id="selectEduPlanListByGbn" resultType="myBatisBaseMap">
+        <include refid="IncludeSql.paging-start"/>
+        SELECT EDU_ID
+             , EDU_TITLE
+             , EDU_GUBUN
+             , (SELECT COMM.FN_COMCODE_NM('FS_446', EDU_GUBUN) FROM DUAL) AS EDU_GUBUN_NM
+             , EDU_STATUS
+             , (SELECT COMM.FN_COMCODE_NM('FS_447', EDU_STATUS) FROM DUAL) AS EDU_STATUS_NM
+             , EDU_TIME || '시간' AS EDU_TIME
+             , LOCKUP_CNT
+             , ATTACH_FILE_ID
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT
+             , REG_ID
+             , TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT
+             , UPD_ID
+             , TO_CHAR(DEL_DT,'YYYY-MM-DD') AS DEL_DT
+             , DEL_ID
+             , GBN
+          FROM COMM.TC_EDU_PLAN
+         WHERE USE_YN = 'Y'
+           <if test='GBN != null and GBN != ""'>
+             AND GBN = #{GBN}
+           </if>
+           <if test='EDU_GUBUN != null and EDU_GUBUN != ""'>
+             AND EDU_GUBUN = #{EDU_GUBUN}
+           </if>
+           <if test='EDU_STATUS != null and EDU_STATUS != ""'>
+             AND EDU_STATUS = #{EDU_STATUS}
+           </if>
+           <if test='EDU_TITLE != null and EDU_TITLE != ""'>
+             AND EDU_TITLE LIKE '%'||#{EDU_TITLE}||'%'
+           </if>
+        ORDER BY EDU_GUBUN, EDU_ID
+        <include refid="IncludeSql.paging-end"/>
+    </select>
+
+    <!-- 교육신청 상세 (기존과 동일 구조) -->
+    <select id="selectEduPlanDetail" resultType="myBatisBaseMap">
+        SELECT EDU_ID
+             , EDU_TITLE
+             , EDU_GUBUN
+             , (SELECT COMM.FN_COMCODE_NM('FS_446', EDU_GUBUN) FROM DUAL) AS EDU_GUBUN_NM
+             , EDU_STATUS
+             , (SELECT COMM.FN_COMCODE_NM('FS_447', EDU_STATUS) FROM DUAL) AS EDU_STATUS_NM
+             , EDU_TIME || '시간' AS EDU_TIME
+             , DES
+             , DES_TEXT
+             , LOCKUP_CNT
+             , ATTACH_FILE_ID
+             , USE_YN
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT
+             , REG_ID
+             , TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT
+             , UPD_ID
+             , TO_CHAR(DEL_DT,'YYYY-MM-DD') AS DEL_DT
+             , DEL_ID
+             , GBN
+          FROM COMM.TC_EDU_PLAN
+         WHERE EDU_ID = #{EDU_ID}
+    </select>
+
+    <!-- 강의 목차 (EDU_BOARD_ID 파라미터) -->
+    <select id="selectEduContentsListByBoard" resultType="myBatisBaseMap">
+        SELECT EDU_ID
+             , CLASS_ORD
+             , TITLE
+             , CLASS_TIME
+          FROM TC_EDU_BOARD_DATA
+         WHERE USE_YN = 'Y'
+           AND EDU_BOARD_ID = #{EDU_BOARD_ID}
+           AND EDU_ID = #{EDU_ID}
+        ORDER BY CLASS_ORD
+    </select>
+
+    <!-- 강의 상세 (EDU_BOARD_ID 파라미터) -->
+    <select id="selectEduClassStatusDataByBoard" resultType="myBatisBaseMap">
+        SELECT ROWNUM AS RNUM
+             , A.EDU_APLY_NO
+             , A.EDU_ID
+             , C.EDU_TITLE
+             , TO_CHAR(A.STUDY_START_DT, 'YYYY-MM-DD') AS STUDY_START_DT
+             , TO_CHAR(A.STUDY_END_DT, 'YYYY-MM-DD') AS STUDY_END_DT
+             , C.EDU_TIME
+             , (SELECT COUNT(ORD_NO) FROM TC_EDU_BOARD_DATA WHERE USE_YN = 'Y' AND EDU_BOARD_ID = #{EDU_BOARD_ID} AND EDU_ID = #{EDU_ID}) AS ORD_CNT
+             , A.ORD_NO
+             , B.CLASS_ORD
+             , B.TITLE
+             , B.ATTACH_FILE_ID
+             , A.STUDY_TIME
+          FROM COMM.TC_EDU_STATUS A
+          LEFT OUTER JOIN COMM.TC_EDU_BOARD_DATA B
+            ON B.EDU_BOARD_ID = #{EDU_BOARD_ID}
+           AND B.EDU_ID = A.EDU_ID
+           AND B.ORD_NO = A.ORD_NO
+          LEFT OUTER JOIN COMM.TC_EDU_PLAN C
+            ON C.EDU_ID = A.EDU_ID
+         WHERE A.EDU_APLY_NO = #{EDU_APLY_NO}
+           AND A.EDU_ID = #{EDU_ID}
+           AND A.ORD_NO = #{ORD_NO}
+        ORDER BY CLASS_ORD
+    </select>
+
+</mapper>
+
+

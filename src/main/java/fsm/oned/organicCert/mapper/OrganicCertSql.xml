@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : OrganicCertSql.xml
+    Description : 인증번호 SQL
+    Modification Information
+
+    수정일       수정자     수정내용
+    ==========   =======    =============================
+    2021.07.15      허은미     최초 생성
+-->
+<mapper namespace="fsm.oned.organicCert.mapper.OrganicCertMapper">
+
+    <!-- 친환경 인증번호 - 조회 -->
+    <select id="selectOrganicCertNo" resultType="myBatisBaseMap">
+        SELECT CERT_ID /* 사용자ID or 업체번호 */
+             , USER_GUBUN /* 사용자구분:1개인, 2업체 */
+             , CERT_GUBUN /* 인증구분 */
+             , CERT_NO /* 인증번호(콤마로 구분) */
+             , CHECK_YN /* 인증번호 확인여부 */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT /* 등록일 */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.REG_ID) AS REG_NM  /* 등록자 */
+             , TO_CHAR(UPD_DT,'YYYY-MM-DD') AS UPD_DT /* 수정일 */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.UPD_ID) AS UPD_NM  /* 수정자 */
+             , TO_CHAR(DEL_ID,'YYYY-MM-DD') AS DEL_ID /* 삭제일 */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.DEL_ID) AS DEL_NM  /* 삭제자 */
+          FROM COMM.TC_EDU_ORGANIC_CERT A
+         WHERE CERT_ID = #{certUserMap.CERT_ID}
+           AND USER_GUBUN = #{certUserMap.USER_GUBUN}
+    </select>
+
+
+    <!-- 친환경 인증번호 - 저장 -->
+    <update id="saveOrganicCertNo">
+        MERGE
+            INTO COMM.TC_EDU_ORGANIC_CERT A
+           USING DUAL
+              ON (A.CERT_ID = #{certUserMap.CERT_ID})
+                WHEN MATCHED THEN
+                    UPDATE
+                       SET A.CERT_GUBUN = #{CERT_GUBUN}
+                         , A.CERT_NO = #{CERT_NO}
+                         , A.CHECK_YN = 'Y'
+                         , A.UPD_DT = SYSDATE
+                         , A.UPD_ID = #{sessionUser.USER_ID}
+                WHEN NOT MATCHED THEN
+                    INSERT (A.CERT_ID, A.USER_GUBUN, A.CERT_GUBUN, A.CERT_NO, A.CHECK_YN, A.REG_DT, A.REG_ID)
+                    VALUES (#{certUserMap.CERT_ID}, #{certUserMap.USER_GUBUN}, #{CERT_GUBUN}, #{CERT_NO}, 'Y', SYSDATE, #{sessionUser.USER_ID})
+    </update>
+
+
+    <!-- 친환경 인증번호(유기수산물인증) - 리스트 -->
+    <select id="selectOrganicCertList" resultType="myBatisBaseMap">
+        SELECT A.OCOCD AS OCOCD /* 업체코드 */
+             , B.CUSTKFIRM AS CUSTKFIRM /* 업체명 */
+             , B.RESINO AS RESINO /* 사업자번호 */
+             , A.CERTNO /* 인증번호 */
+          FROM ORGANICCERT@ORA_NFPIS A
+              JOIN OTCUST@ORA_NFPIS B
+                  ON A.OCOCD = B.RESISIRIALNO
+         WHERE 1=1
+            /*AND RESINO = '5058171805'*/
+            <if test='certUserMap.USER_GUBUN == "1"'><!-- 개인 -->
+                AND CUSTKFIRM = #{certUserMap.USER_NM} /* 업체명(성명) */
+            </if>
+            <if test='certUserMap.USER_GUBUN == "2"'><!-- 업체 -->
+                AND RESINO = (SELECT BIZ_REG_NO FROM COMM.TC_COMPANY_INFO WHERE COMP_NO = #{certUserMap.COMP_NO_BLNG}) /* 사업자번호 */
+            </if>
+        GROUP BY A.OCOCD, B.CUSTKFIRM, B.RESINO, A.CERTNO
+        ORDER BY OCOCD, RESINO, CERTNO
+    </select>
+
+
+    <!-- 친환경 인증번호 - 확인유무 저장 -->
+    <update id="saveCheckOrganicCertNo">
+        UPDATE COMM.TC_EDU_ORGANIC_CERT
+           SET CHECK_YN = 'N'
+         WHERE CERT_ID = #{certUserMap.CERT_ID}
+    </update>
+
+
+    <!-- 친환경 인증번호 - 유기수산물인증 정보 -->
+    <select id="selectOrganicCertInfo" resultType="myBatisBaseMap">
+        SELECT D.JISOKNM AS JISOK_NM /* 인증기관 */
+             , F.CODEKNM AS CODEK_NM /* 인증종류 */
+             , E.GOODKNM AS GOOD_NM /* 인증품종 */
+             , A.CERTNO AS CERT_NO /* 인증번호 */
+             , C.CUSTKFIRM AS COMP_NM_KOR /* 업체명 */
+             , C.HEADKNM AS CEO_NM_KOR /* 대표자 */
+             , REGEXP_REPLACE(C.RESINO, '(.{3})(.+)(.{5})', '\1-\2-\3') AS BIZ_REG_NO /* 사업자번호 */
+             , C.KADDR AS COMP_ADDR /* 업체주소 */
+             , CASE WHEN NVL(C.TEL, C.MOBILE) LIKE '01%' THEN '' ELSE COMM.FN_FMT_TEL(NVL(C.TEL, C.MOBILE)) END AS TEL /* 업제번호 */
+             , A.VDATEFROM /* 인증유효시작일 */
+             , A.VDATETO /* 인증유효종료일 */
+        FROM ORGANICCERT@ORA_NFPIS A
+            JOIN ORGANIC@ORA_NFPIS B
+                ON A.IMPBNO = B.IMPBNO
+                AND A.DIVISION = B.DIVISION
+                AND A.JISOCD = B.JISOCD
+            JOIN OTCUST@ORA_NFPIS C
+                ON B.OCOCD = C.RESISIRIALNO
+            JOIN JISOCODE@ORA_NFPIS D
+                ON A.JISOCD = D.JISOCODE
+            JOIN OGN_GOODCODE@ORA_NFPIS E
+                ON A.GOODCD = E.GOODCD
+            JOIN OGN_DCODE@ORA_NFPIS F
+                ON B.OKIND = F.DCODE
+                AND MCODE = '05'
+        WHERE A.CANCELDT IS NULL
+          AND A.CERTNO = #{CERT_NO}
+          AND ROWNUM = '1' /* 가장 최근 인증정보 */
+        ORDER BY VDATEFROM DESC
+    </select>
+
+</mapper>

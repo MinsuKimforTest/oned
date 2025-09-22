@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:egov-security="http://www.egovframe.go.kr/schema/egov-security"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+		http://www.egovframe.go.kr/schema/egov-security http://www.egovframe.go.kr/schema/egov-security/egov-security-3.7.xsd">
+
+    <!--인증된 유저의 session, 권한, 인증 여부를 확인 할 수있는 서비스 클래스-->
+	<bean id="userDetailsHelper" class="fsm.oned.comm.util.UserDetailsHelper">
+        <property name="userDetailsService">
+        	<!-- 원하는 bean id를 아래에 ref 태그에 적용한다 -->
+            <ref bean="userDetailsSessionService" />
+        </property>
+    </bean>
+    
+    <!-- 1. 세션을 이용한 인증을 사용하는 빈 -->
+    <bean id="userDetailsSessionService" class="fsm.oned.comm.service.impl.UserDetailsSessionServiceImpl"/>
+		
+</beans>

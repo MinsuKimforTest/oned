@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="privacyLogDAO">
+    <insert id="privacyLogDAO.insertPrivacyLog" >
+        <selectKey resultClass="int" keyProperty="SEQ">
+            SELECT SEQ_TC_MENU_PRIVACY_LOG_01.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TC_MENU_PRIVACY_LOG (
+              SEQ
+            , USER_ID
+            , IP
+            , URL
+            , PARAM
+            , REG_DT
+            , SCE_SYS_CD
+        ) VALUES (
+              #SEQ#
+            , #USER_ID#
+            , #IP#
+            , #URL#
+            , #PARAM#
+            , SYSDATE
+            , #SCE_SYS_CD#
+        )
+    </insert>
+</sqlMap>

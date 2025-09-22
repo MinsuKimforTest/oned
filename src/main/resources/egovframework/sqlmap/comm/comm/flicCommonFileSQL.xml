@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="flicCommonFileDAO">
+    
+    
+    <select id="flicCommonFileDAO.selectAtchFileForDownload" resultClass="myBatisBaseMap">
+     SELECT FILE_ID /* 파일 ID */
+             , FILE_SEQ /* 첨부파일 일련번호 */
+             , FILE_NM /* 첨부파일 명 */
+             , CHG_FILE_NM /* 변경 첨부파일 명 */
+             , FILE_PATH /* 첨부파일 경로 */
+             , FILE_SIZE /* 첨부파일 크기 */
+         FROM TC_ATCH_FILE
+        WHERE FILE_ID = #fileId#
+          AND FILE_SEQ = #fileSeq#
+    
+    </select>
+    <select id="flicCommonFileDAO.selectAtchFile" resultClass="myBatisBaseMap">
+        SELECT FILE_ID /* 파일 ID */
+             , FILE_SEQ /* 첨부파일 일련번호 */
+             , FILE_NM /* 첨부파일 명 */
+             , CHG_FILE_NM /* 변경 첨부파일 명 */
+             , FILE_PATH /* 첨부파일 경로 */
+             , FILE_SIZE /* 첨부파일 크기 */
+         FROM TC_ATCH_FILE
+        WHERE FILE_ID = #fileId#
+    </select>
+    
+     <!-- 파일등록 --> 
+    <insert id="flicCommonFileDAO.insertAtchFile" >
+      INSERT INTO TC_ATCH_FILE
+      (  FILE_ID /* 파일 ID */
+       , FILE_SEQ /* 첨부파일 일련번호 */
+       , FILE_NM /* 첨부파일 명 */
+       , CHG_FILE_NM /* 변경 첨부파일 명 */
+       , FILE_PATH /* 첨부파일 경로 */
+       , FILE_SIZE /* 첨부파일 크기 */
+       , REG_ID /* 등록자 */
+       , REG_DT /* 등록일시 */
+       , UPD_ID /* 수정자 */
+       , UPD_DT /* 수정일시 */
+      )
+      VALUES
+      ( #fileId# /* 파일 ID */
+      , (SELECT NVL(MAX(FILE_SEQ),0)+1 FROM TC_ATCH_FILE  WHERE FILE_ID = #fileId#) /* 첨부파일 일련번호 */
+      , #fileNm# /* 첨부파일 명 */
+      , #chgFileNm# /* 변경 첨부파일 명 */
+      , #filePath# /* 첨부파일 경로 */
+      , #fileSize# /* 첨부파일 크기 */
+      , #sessionUser.USER_ID# /* 최초 자료 등록자 ID */
+      , SYSDATE /* YYYY-MM-DD HH:MM:SS 타입(일시), 최초 자료등록일시 */
+      , #sessionUser.USER_ID# /* 최근 자료 수정자ID, */
+      , SYSDATE /* YYYY-MM-DD HH:MM:SS 타입(일시), 최근 자료수정일 */
+      )
+    </insert>
+    
+    <!-- 파일삭제 -->
+    <delete id="flicCommonFileDAO.deleteAtchFile" >
+      DELETE TC_ATCH_FILE
+       WHERE FILE_ID  =  #fileId#
+         AND FILE_SEQ  =  #fileSeq#
+    </delete>
+    
+</sqlMap>

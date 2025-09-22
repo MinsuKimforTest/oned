@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : BoardSql.xml
+    Description : 게시판 SQL
+    Modification Information
+
+    수정일       수정자     수정내용
+    ==========   =======    =============================
+    2021.07.15      허은미     최초 생성
+-->
+<mapper namespace="fsm.oned.board.mapper.BoardMapper">
+
+    <!-- 게시판 정보 -->
+    <select id="selectBoardInfo" resultType="myBatisBaseMap">
+        SELECT A.MENU_ID
+             , A.MENU_NM
+             , B.BOARD_ID
+             , B.BOARD_TITLE
+             , B.BOARD_TYPE
+             , B.SECRET_AT
+             , B.ANONYMOUS_AT
+             , B.REG_ID
+             , A.EXT2 AS BOARD_AUTH
+        FROM COMM.TC_MENU A
+                 LEFT JOIN COMM.TC_BOARD_MNG B ON A.EXT1 = B.BOARD_ID
+            AND B.USE_YN = 'Y'
+        WHERE A.MENU_ID = #{MENU_ID}
+          AND A.USE_YN = 'Y'
+    </select>
+
+
+    <!-- 게시판 - 리스트 조회 -->
+    <select id="selectBoardList" resultType="myBatisBaseMap">
+        <include refid="IncludeSql.paging-start"></include>
+        SELECT BOARD_ID /* 게시판ID */
+             , ORD_NO /* 게시글 순번 */
+             , TITLE /* 제목 */
+             , NVL(LOCKUP_CNT, 0) AS LOCKUP_CNT /* 조회수 */
+             , ATTACH_FILE_ID /* 첨부파일ID */
+             , NVL2(ATTACH_FILE_ID,'Y','N') AS ATTACH_FILE_AT /*첨부파일 등록 여부 */
+             , UPPER_ORD_NO /* 상위 게시글 순번 */
+             , USE_YN /* 사용여부 */
+             , TEXT_PASSWORD /* 비밀번호 */
+             , NVL2(NVL2(UPPER_ORD_NO, (SELECT TEXT_PASSWORD FROM COMM.TC_BOARD_DATA S WHERE S.BOARD_ID = A.BOARD_ID AND S.ORD_NO = A.UPPER_ORD_NO), TEXT_PASSWORD), 'Y', 'N') AS PASSWORD_AT /* 비밀번호 여부 */
+             , REG_ID /* 등록자ID */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.REG_ID) AS REG_NM  /* 등록자이름 */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT/* 등록일시 */
+             , '1' AS LV
+          FROM COMM.TC_BOARD_DATA A
+         WHERE USE_YN = 'Y'
+           AND BOARD_ID = #{BOARD_ID}
+            <if test='TITLE != "" and TITLE != null '> <!--제목 -->
+                AND TITLE LIKE '%'||#{TITLE}||'%'
+            </if>
+            <if test='DES != "" and DES != null '> <!--내용 -->
+                AND DES LIKE '%'||#{DES}||'%'
+            </if>
+        ORDER BY NOTICE_YN DESC, ORD_NO DESC
+        <include refid="IncludeSql.paging-end"></include>
+    </select>
+
+
+    <!-- 게시판 - 답변형 리스트 조회 -->
+    <select id="selectAnswerBoardList" resultType="myBatisBaseMap">
+        <include refid="IncludeSql.paging-start"></include>
+        SELECT BOARD_ID
+             , ORD_NO /* 게시글 순번 */
+             , TITLE /* 제목 */
+             , NVL(LOCKUP_CNT, 0) AS LOCKUP_CNT /* 조회수 */
+             , ATTACH_FILE_ID /* 첨부파일ID */
+             , NVL2(ATTACH_FILE_ID,'Y','N') AS ATTACH_FILE_AT /*첨부파일 등록 여부 */
+             , UPPER_ORD_NO /* 상위 게시글 순번 */
+             , USE_YN /* 사용여부 */
+             , TEXT_PASSWORD /* 비밀번호 */
+             , NVL2(NVL2(UPPER_ORD_NO, (SELECT TEXT_PASSWORD FROM COMM.TC_BOARD_DATA S WHERE S.BOARD_ID = A.BOARD_ID AND S.ORD_NO = A.UPPER_ORD_NO), TEXT_PASSWORD), 'Y', 'N') AS PASSWORD_AT /* 비밀번호 여부 */
+             , REG_ID /* 등록자ID */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.REG_ID) AS REG_NM  /* 등록자이름 */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT/* 등록일시 */
+             , TO_CHAR(LEVEL) AS LV
+          FROM COMM.TC_BOARD_DATA A
+         WHERE USE_YN = 'Y'
+           AND BOARD_ID = #{BOARD_ID}
+            <if test='TITLE != "" and TITLE != null '> <!--제목 -->
+                AND TITLE LIKE '%'||#{TITLE}||'%'
+            </if>
+            <if test='DES != "" and DES != null '> <!--내용 -->
+                AND DES LIKE '%'||#{DES}||'%'
+            </if>
+        START WITH UPPER_ORD_NO IS NULL
+               AND BOARD_ID = 'BOARD052'
+               AND DEL_DT IS NULL
+        CONNECT BY PRIOR ORD_NO = UPPER_ORD_NO
+                     AND BOARD_ID = 'BOARD052'
+                     AND DEL_DT IS NULL
+        ORDER SIBLINGS BY NOTICE_YN DESC, A.ORD_NO DESC
+        <include refid="IncludeSql.paging-end"></include>
+    </select>
+
+
+    <!-- 게시글 - 상세 조회 -->
+    <resultMap id="getBoardDataMap" type="HashMap">
+        <result property="DES" column="DES" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+
+    <select id="selectBoardDetail" resultMap="getBoardDataMap">
+        SELECT A.BOARD_ID /* 게시판ID */
+             , A.ORD_NO /* 게시글 순번 */
+             , A.TITLE /* 제목 */
+             , A.DES /* 내용 */
+             , A.DES_TEXT /* 내용요약 */
+             , NVL(A.LOCKUP_CNT,0) AS LOCKUP_CNT/* 조회수 */
+             , A.ATTACH_FILE_ID /* 첨부파일ID */
+             , NOTICE_YN /* 공지여부 */
+             , POST_PRD_FROM_DT /* 게시기간 시작 */
+             , POST_PRD_TO_DT /* 게시기간 종료 */
+             , UPPER_ORD_NO /* 상위 게시글 순번 */
+             , A.USE_YN /* 사용여부 */
+             , TEXT_PASSWORD /* 비밀번호 */
+             , NVL2(NVL2(UPPER_ORD_NO, (SELECT TEXT_PASSWORD FROM COMM.TC_BOARD_DATA S WHERE S.BOARD_ID = A.BOARD_ID AND S.ORD_NO = A.UPPER_ORD_NO), TEXT_PASSWORD), 'Y', 'N') AS PASSWORD_AT /* 비밀번호 여부 */
+             , A.REG_ID /* 등록자ID */
+             , (SELECT USER_NM FROM TC_USER_INFO S WHERE S.USER_ID = A.REG_ID) AS REG_NM
+             , TO_CHAR(A.REG_DT,'YYYY-MM-DD') AS REG_DT/* 등록일시 */
+        FROM COMM.TC_BOARD_DATA A
+        WHERE A.BOARD_ID = #{BOARD_ID}
+          AND A.ORD_NO = #{ORD_NO}
+    </select>
+
+
+    <!-- 게시글 - 조회수 count -->
+    <update id="increaseBoardLockupCnt">
+        UPDATE COMM.TC_BOARD_DATA
+        SET LOCKUP_CNT = NVL(LOCKUP_CNT,0) + 1
+         WHERE BOARD_ID = #{BOARD_ID}
+           AND ORD_NO = #{ORD_NO}
+    </update>
+
+    <!-- 게시글 - 등록 -->
+    <insert id="insertBoardData">
+        <selectKey resultType="string" keyProperty="ORD_NO" order="BEFORE">
+            (SELECT NVL(MAX(ORD_NO),0)+1 FROM TC_BOARD_DATA  WHERE BOARD_ID = #{BOARD_ID} )
+        </selectKey>
+
+        INSERT INTO COMM.TC_BOARD_DATA
+        (  BOARD_ID /* 게시판ID */
+         , ORD_NO /* 게시글 순번 */
+         , TITLE /* 제목 */
+         , DES /* 내용 */
+         , LOCKUP_CNT /* 조회수 */
+         , ATTACH_FILE_ID /* 첨부파일ID */
+         , TEXT_PASSWORD /* 게시글비밀번호 */
+         , USE_YN /* 사용여부 */
+         , REG_DT /* 등록일시 */
+         , REG_ID /* 등록자ID */
+        )
+        VALUES
+        (  #{BOARD_ID} /* 게시판ID */
+         , #{ORD_NO} /* 게시글 순번 */
+         , #{TITLE} /* 제목 */
+         , #{DES_CK} /* 내용 */
+         , 0 /* 조회수 */
+         , #{ATTACH_FILE_ID} /* 첨부파일ID */
+         , #{TEXT_PASSWORD} /* 게시글비밀번호 */
+         , 'Y' /* 사용여부 */
+         , SYSDATE /* YYYY-MM-DD HH:MM:SS 타입(일시), 최초 자료등록일시 */
+         , #{sessionUser.USER_ID}
+        )
+    </insert>
+
+
+    <!-- 게시글 - 수정  -->
+    <update id="updateBoardData">
+        UPDATE TC_BOARD_DATA
+           SET TITLE = #{TITLE} /* 제목 */
+             , DES = #{DES_CK} /* 내용 */
+             , ATTACH_FILE_ID = CASE WHEN (SELECT COUNT(*) FROM TC_ATCH_FILE WHERE FILE_ID = #{ATTACH_FILE_ID}) = 0 THEN '' ELSE #{ATTACH_FILE_ID} END /* 첨부파일ID */
+             , TEXT_PASSWORD = #{TEXT_PASSWORD}
+             , UPD_DT = SYSDATE  /* YYYY-MM-DD HH:MM:SS 타입(일시), 최근 자료수정일 */
+             , UPD_ID = #{sessionUser.USER_ID}  /* 게시판 관리ID, 최근 자료 수정자ID, */
+         WHERE BOARD_ID = #{BOARD_ID} /* 게시판 ID */
+           AND ORD_NO = #{ORD_NO}
+    </update>
+
+
+    <!-- 게시글 - 삭제 -->
+    <update id="deleteBoardData">
+        UPDATE COMM.TC_BOARD_DATA
+        SET USE_YN = 'N'
+          , DEL_DT = SYSDATE /* YYYY-MM-DD HH:MM:SS 타입(일시), 자료 삭제일 */
+          , DEL_ID = 'admin'  /* 게시판 관리ID, 자료 삭제자 ID */
+        WHERE BOARD_ID = #{BOARD_ID} /* 게시판 ID */
+          AND ORD_NO = #{ORD_NO}
+    </update>
+
+
+    <!-- 게시글 - 비밀번호 조회 -->
+    <select id="selectCheckBoardPassword" resultType="string">
+        SELECT *
+        FROM (
+                 SELECT NVL2(UPPER_ORD_NO, (SELECT TEXT_PASSWORD
+                                            FROM COMM.TC_BOARD_DATA S
+                                            WHERE S.BOARD_ID = A.BOARD_ID
+                                              AND S.ORD_NO = A.UPPER_ORD_NO),
+                             TEXT_PASSWORD) AS TEXT_PASSWORD
+                 FROM COMM.TC_BOARD_DATA A
+                 WHERE A.BOARD_ID = #{BOARD_ID}
+                   AND A.ORD_NO = #{ORD_NO}
+             )
+        WHERE TEXT_PASSWORD = #{TEXT_PASSWORD}
+    </select>
+
+
+    <!-- 메인(공지사항) - 리스트 조회 -->
+    <select id="selectBoardNoticeList" resultMap="getBoardDataMap">
+        SELECT BOARD_ID /* 게시판ID */
+             , ORD_NO /* 게시글 순번 */
+             , TITLE /* 제목 */
+             , DES /* 내용 */
+             , TO_CHAR(REG_DT,'YYYY-MM-DD') AS REG_DT/* 등록일시 */
+          FROM COMM.TC_BOARD_DATA A
+         WHERE USE_YN = 'Y'
+           AND BOARD_ID = 'BOARD050'
+        ORDER BY NOTICE_YN DESC, ORD_NO DESC
+    </select>
+
+    <select id="selectBoardInfoCheck" resultType="int">
+        SELECT COUNT(*)
+        FROM COMM.TC_BOARD_DATA A
+        WHERE A.BOARD_ID = #{BOARD_ID}
+          AND A.ORD_NO = #{ORD_NO}
+          AND A.REG_ID = #{REG_ID}
+    </select>
+</mapper>
