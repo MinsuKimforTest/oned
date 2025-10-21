@@ -53,13 +53,6 @@
                         </colgroup>
                         <tbody>
                             <tr>
-                                <th>구분</th>
-                                <td>
-                                    <c:out value="${eduData.EDU_GUBUN_NM}"/>
-                                    <input type="hidden" id="EDU_GUBUN" value="<c:out value="${eduData.EDU_GUBUN}"/>"/>
-                                </td>
-                            </tr>
-                            <tr>
                                 <th>교육명</th>
                                 <td><c:out value="${eduData.EDU_TITLE}"/></td>
                             </tr>
@@ -71,69 +64,6 @@
                     </table>
                 </div>
                 <!-- //edu data -->
-
-                <!-- apply data -->
-                <div class="table_popup">
-                    <h4 class="stit">업체정보 <span>* 업체정보는 사용자계정 정보와 연동됩니다.</span></h4>
-                    <table class="table_col responsive mt5 mb20">
-                        <colgroup>
-                            <col width="20%">
-                            <col width="30%">
-                            <col width="20%">
-                            <col width="30%">
-                        </colgroup>
-                        <tbody>
-                        <tr>
-                            <th>신청단위 <em>*</em></th>
-                            <td colspan="3">
-                                <select id="EDU_APLY_UNIT" style="width: 37%" caption="신청단위" required <c:if test="${paramMap.STATE == 'R'}">disabled</c:if>></select>
-                                <span><em style="padding: 0 5px">*</em>PLOR 교육 신청 단위와 동일하게 선택</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>업체명(성명) <em>*</em></th>
-                            <td>
-                                <span class="unit-none"><c:out value="${compData.COMP_NM_KOR}"/></span>
-                                <input type="hidden" id="COMP_NM_KOR" value="<c:out value="${compData.COMP_NM_KOR}"/>" >
-                            </td>
-                            <th>인증번호</th>
-                            <td>
-                                <c:out value="${compData.CERT_NO}"/>
-                                <c:if test="${compData.CERT_GUBUN == '1'}">(최초 인증사업자는 제외)</c:if>
-                                <input type="hidden" id="CERT_NO" value="<c:out value="${compData.CERT_NO}"/>">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>대표자 성명 <em>*</em></th>
-                            <td>
-                                <span class="unit-none"><c:out value="${compData.CEO_NM_KOR}"/></span>
-                                <input type="hidden" id="CEO_NM_KOR" value="<c:out value="${compData.CEO_NM_KOR}"/>" >
-                            </td>
-                            <th>사업자번호</th>
-                            <td>
-                                <c:out value="${fn:substring(compData.BIZ_REG_NO,0,3)}-${fn:substring(compData.BIZ_REG_NO,3,5)}-${fn:substring(compData.BIZ_REG_NO,5,10)}"/>
-                                <input type="hidden" id="BIZ_REG_NO" class="company-number" value="<c:out value="${compData.BIZ_REG_NO}"/>">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>사업장 소재지</th>
-                            <td colspan="3">
-                                <c:if test="${paramMap.STATE == 'I'}">
-                                    <input type="hidden" id="COMP_ZIPCD_ST" style="width: 15%" placeholder="우편번호" value="<c:out value="${compData.COMP_ZIPCD_ST}"/>" readonly />
-                                    <a href="#" id="addrBtn" class="btn" style="display: none">주소찾기</a>
-                                    <input type="hidden" id="COMP_ADDR1_ST" style="width: 40%" value="<c:out value="${compData.COMP_ADDR1_ST}"/>" readonly />
-                                    <input type="hidden" id="COMP_ADDR2_ST" style="width: 25%" value="<c:out value="${compData.COMP_ADDR2_ST}"/>" placeholder="상세주소" />
-                                </c:if>
-                                <c:if test="${paramMap.STATE == 'R'}">
-                                    <span class="unit-none">
-                                        <c:out value="(${applyData.COMP_ZIPCD_ST})${applyData.COMP_ADDR1_ST}${applyData.COMP_ADDR2_ST}"/>
-                                    </span>
-                                </c:if>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
 
                 <div class="table_popup">
                     <h4 class="stit">신청정보</h4>
@@ -154,25 +84,14 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>직책 및 담당업무 <em>*</em></th>
-                            <td colspan="3"><select id="EDU_APLY_WORK" style="width: 37%" caption="직책 및 담당업무" required <c:if test="${paramMap.STATE == 'R'}">disabled</c:if>></select></td>
+                            <th>담당지원 <em>*</em></th>
+                            <td colspan="3"><select id="EDU_APLY_WORK" style="width: 37%" caption="담당지원" required <c:if test="${paramMap.STATE == 'R'}">disabled</c:if>></select></td>
                         </tr>
                         <tr>
                             <th>전화번호<br>(문자수신가능)</th>
                             <td><input type="text" id="EDU_APLY_TEL" class="phone-number" value="<c:out value="${applyData.EDU_APLY_TEL != null? applyData.EDU_APLY_TEL : compData.MBL_NO}"/>" maxlength="13" <c:if test="${paramMap.STATE == 'R'}">disabled</c:if>></td>
                             <th>전자우편(E-mail)</th>
                             <td><input type="text" id="EDU_APLY_EMAIL" value="<c:out value="${applyData.EDU_APLY_EMAIL != null? applyData.EDU_APLY_EMAIL : compData.EMAIL_ID}"/>" <c:if test="${paramMap.STATE == 'R'}">disabled</c:if>></td>
-                        </tr>
-                        <tr>
-                            <th>인증종류 <em>*</em></th>
-                            <td colspan="3">
-                                <c:forEach var="item" items="${certCd}" varStatus="status">
-                                    <fieldset class="ckdbox">
-                                        <input type="checkbox" id="EDU_CERT_METHOD${status.count}" name="EDU_CERT_METHOD" value="${item.CD}" <c:if test="${paramMap.STATE == 'R'}">disabled</c:if>>
-                                        <label for="EDU_CERT_METHOD${status.count}">&nbsp;<c:out value="${item.CD_NM}"/></label>
-                                    </fieldset>&nbsp;&nbsp;
-                                </c:forEach>
-                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -258,8 +177,6 @@
 <!-- //popup wrap --->
 
 <!-- 교육신청안내 -->
-<%@include file="../edu/eduNoticePopup.jsp"%>
-
 <%@include file="../../comm/inc_javascript.jsp"%>
 <script>
     /*===================================================페이지 초기화,콜백함수 시작=============================*/
@@ -267,7 +184,8 @@
         if("I" == '${paramMap.STATE}'){
             $(".modal").fadeIn();
         }
-        lpCom.setCodeSelect(["EDU_APLY_UNIT"], {MSTR_CD:["FS_472"],first:"S",selectCd:"<c:out value="${applyData.EDU_APLY_UNIT}"/>"}); //신청단위
+        lpCom.setCodeSelect(["EDU_APLY_WORK"], {MSTR_CD:["MQM54"],first:"S",selectCd:"<c:out value="${applyData.EDU_APLY_WORK}"/>"}); //지원정보
+
 
         if('${paramMap.STATE}' == 'I'){         //신청서 작성
             //날짜 Setting
@@ -280,13 +198,6 @@
             $(".eduAplyYear").html('<fmt:parseDate var="eduAplyDt" value="${applyData.EDU_APLY_DT}" pattern="yyyy-MM-dd" /><fmt:formatDate value="${eduAplyDt}" pattern="yyyy"/>');
             $(".eduAplyDt").html('<fmt:formatDate value="${eduAplyDt}" pattern="yyyy"/>년 <fmt:formatDate value="${eduAplyDt}" pattern="MM"/>월 <fmt:formatDate value="${eduAplyDt}" pattern="dd"/>일');
         }
-
-        //인증종류 check
-        var eduCertMethod = '<c:out value="${applyData.EDU_CERT_METHOD}"/>';
-        var eduCertMethodSplit = eduCertMethod.split(',');
-        for(var i in eduCertMethodSplit) {
-            $("input[name='EDU_CERT_METHOD'][value='" + eduCertMethodSplit[i] + "']").prop("checked", true);
-        }
     });
 
     /**
@@ -296,12 +207,7 @@
         switch (pSid) {
             case "save" : // PLOR 교육신청 저장
                 window.close();
-                opener.lpCom.href("/edu/plor/classRoomList.do");
-                break;
-            case "juso": //주소
-                $("#COMP_ZIPCD_ST").val(pData.zipNo); //우편번호
-                $("#COMP_ADDR1_ST").val(pData.roadAddrPart1); // 기본주소
-                $("#COMP_ADDR2_ST").val(pData.addrDetail); // 상세주소
+                opener.lpCom.href("/edu/actionEduClassRoomList.do");
                 break;
         }
 
@@ -331,17 +237,10 @@
                 otherInit.formObj = $("#applyFrm");
 
                 var param = {};
-                var certMethodArr = [];
-                $('input[name="EDU_CERT_METHOD"]:checked').each(function(){
-                    var certMethod = $(this).val();
-                    certMethodArr.push(certMethod);
-                });
-                param.EDU_CERT_METHOD_ARR = certMethodArr.join();
 
-                if(!lpCom.isRequired($("input[name='EDU_CERT_METHOD']:checked"), "인증종류는 필수 입력 값입니다.")) return;
                 if(!lpCom.isRequired($("input[name='PRIVACY_AGREE_YN']:checked"), "개인정보 활용 동의서는 필수 입력 값입니다.")) return;
                 if(!lpCom.actionBeforeConfirm("S",otherInit.formObj)) return;// 메세지 처리 및 폼체크
-                lpCom.Ajax("save", "/edu/plor/saveApply.do", param, calBackFunc, otherInit);
+                lpCom.Ajax("save", "/edu/unified/saveEduApply.do?eduType=PLOR", param, calBackFunc, otherInit);
             });
 
             //출력
@@ -367,49 +266,14 @@
         }
 
         {//change 이벤트 활당
-            //신청단위 : 단체
-            $("#EDU_APLY_UNIT").on("change", function(e) {
-                if('${paramMap.STATE}' == 'I'){
-                    $("#COMP_NM_KOR").attr("type", "hidden");
-                    $("#CEO_NM_KOR").attr("type", "hidden");
-                    $("#COMP_ZIPCD_ST").attr("type", "hidden");
-                    $("#COMP_ADDR1_ST").attr("type", "hidden");
-                    $("#COMP_ADDR2_ST").attr("type", "hidden");
-                    $("#addrBtn").hide();
-                    $(".unit-none").show();
 
-                    if("3" == $("#EDU_APLY_UNIT").val()){
-                        alert("단체인 경우, 업체명과 대표자명을 입력해주시기바랍니다.");
-                        $("#COMP_NM_KOR").attr("type", "text");
-                        $("#CEO_NM_KOR").attr("type", "text");
-                        $(".unit-none").hide();
-                    }
-
-                    if("1" == $("#EDU_APLY_UNIT").val() || "3" == $("#EDU_APLY_UNIT").val()){
-                        $("#COMP_ZIPCD_ST").attr("type", "text");
-                        $("#COMP_ADDR1_ST").attr("type", "text");
-                        $("#COMP_ADDR2_ST").attr("type", "text");
-                        $("#addrBtn").show();
-                    }
-                }
-            });
-
-            $("#EDU_APLY_UNIT").on("change", function(e) {
-                selectEduApplyWorkOptions("EDU_APLY_WORK",{first:"S",selectCd:"<c:out value="${applyData.EDU_APLY_WORK}"/>"});
-            });
         }
     }
     /*===================================================오브젝트 이벤트 활당 종료(lpCom.js 에서 호출됨)=========*/
 
     /*===================================================사용자 함수 설정 시작 =================================*/
-    var selectEduApplyWorkOptions = function(pTargetId,pParam){
-        pParam.pUrl = "/edu/plor/selectApplyWorkOptions.do?EDU_APLY_UNIT="+$("#EDU_APLY_UNIT").val();
-        pParam.cond = {MSTR_CD:["FS_467"]};
-        return lpCom.setComSelect(pTargetId,pParam)
-    }
+
     /*===================================================사용자 함수종료 시작 =================================*/
 </script>
 </body>
 </html>
-
-

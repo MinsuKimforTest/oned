@@ -6,7 +6,7 @@
 		<bean id="sqlSession" class="fsm.oned.comm.RefreshableSqlSessionFactoryBean"> <!-- org.mybatis.spring.SqlSessionFactoryBean 변경  RefreshableSqlSessionFactoryBean -->
 			<property name="dataSource" ref="dataSource" />
 			<property name="configLocation" value="classpath:/egovframework/sqlmap/config/${Globals.DbType}/sql-mapper-config.xml" />
-			<property name="mapperLocations" value="classpath*:/**/mapper/*Sql.xml" />
+			<property name="mapperLocations" value="classpath*:/**/mapper/**/*Sql.xml" />
 			<property name="interval" value="1000" />
 		</bean>
 
@@ -22,7 +22,7 @@
 		<bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean"> <!-- org.mybatis.spring.SqlSessionFactoryBean 변경  RefreshableSqlSessionFactoryBean -->
 			<property name="dataSource" ref="dataSource" />
 			<property name="configLocation" value="classpath:/egovframework/sqlmap/config/${Globals.DbType}/sql-mapper-config.xml" />
-			<property name="mapperLocations" value="classpath*:/**/mapper/*Sql.xml" />
+			<property name="mapperLocations" value="classpath*:/**/mapper/**/*Sql.xml" />
 		</bean>
 
 		<bean id="sqlSessionTibero" class="org.mybatis.spring.SqlSessionFactoryBean"> <!-- org.mybatis.spring.SqlSessionFactoryBean 변경  RefreshableSqlSessionFactoryBean -->

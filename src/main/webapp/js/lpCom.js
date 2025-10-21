@@ -2231,7 +2231,7 @@ lpCom.fileZone = function(pOption){
              var formData = new FormData();
              formData.append("fileId",pOption.fileIdValue);
              $.ajax({
-                 url: "../comm/selectAtchFile.do",
+                 url: lpCom.contextPath + "/comm/selectAtchFile.do",
                  type: 'POST',
                  data : formData,
                  contentType:false,

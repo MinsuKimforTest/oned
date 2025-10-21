@@ -212,15 +212,30 @@
                 var gbn = "<c:out value="${applyData.GBN}"/>";
                 if(eduCertNo == ""){
                     alert("교육 이수증이 발급되지 않았습니다.");
-                }else{
-                    var params = {};
-                    params.EDU_CERT_NO = eduCertNo;
-                    params.GBN = gbn;
-                    var opt = {};
-                    opt.width = "750";
-                    opt.height = "615";
-                    lpCom.winOpen('/edu/actionEduCertForm.do', "교육 이수증", params, opt);
+                    return;
                 }
+
+                var params = {};
+                params.EDU_CERT_NO = eduCertNo;
+                params.GBN = gbn;
+                params.eduType = gbn;
+                var opt = {};
+                opt.width = "750";
+                opt.height = "615";
+
+                switch (gbn) {
+                    case "PLOR":
+                        url = "/edu/unified/actionEduCertForm.do";
+                        break;
+                    case "SAFETY":
+                        url = "/edu/unified/actionEduCertForm.do";
+                        break;
+                    default:
+                        url = "/edu/actionEduCertForm.do";
+                        return;
+                }
+                lpCom.winOpen(url, "교육 이수증", params, opt);
+
             });
         }
 

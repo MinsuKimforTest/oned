@@ -50,10 +50,6 @@
                     <div id="sysSearch" class="sch_Wrap">
                         <ul class="form">
                             <li>
-                                <label for="EDU_GUBUN">구분</label>
-                                <select id="EDU_GUBUN" class="sch_form" style="width: 90px"></select>
-                            </li>
-                            <li>
                                 <label for="EDU_STATUS">상태</label>
                                 <select id="EDU_STATUS" class="sch_form" style="width: 90px"></select>
                             </li>
@@ -71,7 +67,6 @@
                         <table class="table_col">
                             <colgroup>
                                 <col width="5%">
-                                <col width="15%">
                                 <col width="45%">
                                 <col width="10%">
                                 <col width="10%">
@@ -80,7 +75,6 @@
                             <thead>
                             <tr>
                                 <th>번호</th>
-                                <th>구분</th>
                                 <th>교육명</th>
                                 <th>상태</th>
                                 <th>교육 시간</th>
@@ -108,14 +102,15 @@
 </div>
 <!-- wrap --->
 
-<!-- 친환경 인증 -->
-<%@include file="../../organicCert/organicCertNoPopup.jsp"%>
 
 <%@include file="../../comm/inc_javascript.jsp"%>
 <script>
     /*===================================================페이지 초기화,콜백함수 시작=============================*/
+    // 교육 타입 설정
+    var EDU_TYPE = "SAFETY";
+    
     $(document).ready(function() {
-        lpCom.setCodeSelect(["EDU_GUBUN","EDU_STATUS"], {MSTR_CD:["FS_446","FS_447"],first:"A"}); //교육구분, 교육상태
+        lpCom.setCodeSelect(["EDU_STATUS"], {MSTR_CD:["FS_447"],first:"A"}); //교육구분, 교육상태
         lpCom.getSearchCond();
         lpCom.enterEventId("sysSearch", "fnSearch(1)");
         fnSearch($("#selectPage").val());
@@ -132,24 +127,6 @@
                 console.log("pSid11 : ",pSid);
                 console.log("pData11 : ",pData);
                 fnSetList(pData);
-                break;
-            case "certNo" : // 친환경 인증번호 등록
-                console.log("pSid : ",pSid);
-                console.log("pData : ",pData);
-                //$("#certDiv").fadeIn();
-                if(pData.retData == null || pData.retData.CHECK_YN == "N"){
-                    $("#checkYn").val("N");
-                    $("#certDiv").fadeIn();
-                }else{
-                    $("#checkYn").val("Y");
-                    $("#certDiv").fadeOut();
-                    if(lpCom.isEmpty(pData.retData.CERT_NO)){   //친환경 인증번호X 신규
-                        $("#EDU_GUBUN").val("1");
-                    }else{                                      //친환경 인증번호O 갱신
-                        $("#EDU_GUBUN").val("2");
-                    }
-                    fnSearch(1);
-                }
                 break;
         }
     }
@@ -184,7 +161,7 @@
         otherInit.isSuccesMsg = false;
 
         var param = $("#schFrm").srializeJsonById();
-        lpCom.Ajax("search", "/edu/safety/selectPlanList.do", param, calBackFunc, otherInit);
+        lpCom.Ajax("search", "/edu/unified/selectPlanList.do?eduType=" + EDU_TYPE, param, calBackFunc, otherInit);
     }
 
     //리스트
@@ -197,7 +174,6 @@
         for(i in pData.list){
             listHtml.push('<tr onclick=fnMoveDetail("' + pData.list[i].EDU_ID + '")>');
             listHtml.push('<td data-title="번호">'+pData.list[i].RNUM+'</td>');
-            listHtml.push('<td data-title="구분">'+pData.list[i].EDU_GUBUN_NM+'</td>');
             listHtml.push('<td data-title="교육명" class="txtL">'+pData.list[i].EDU_TITLE+'</td>');
             listHtml.push('<td data-title="상태"><span style="color: #00a2ff;">'+pData.list[i].EDU_STATUS_NM+'</span></td>');
             listHtml.push('<td data-title="교육 시간">'+pData.list[i].EDU_TIME+'</td>');
@@ -219,7 +195,8 @@
         lpCom.setSearchCond(); //페이지 이동 검색조건 파라메터 저장(폼 ID는 schFrm 해야 작동함)
         var postData = {};
         postData.returnUrl = "${currentMemu.CURRENT_MENU_URL}";
-        lpCom.hrefOrSubmit("/edu/safety/planDetail.do?EDU_ID=" + eduId ,postData);
+        var menuParam = "${param.MENU_ID}" ? "&MENU_ID=${param.MENU_ID}" : "";
+        lpCom.hrefOrSubmit("/edu/unified/actionEduPlanSafetyDetail.do?eduType=" + EDU_TYPE + "&EDU_ID=" + eduId + menuParam, postData);
     }
 
     //SAFETY 교육 신청
@@ -233,6 +210,7 @@
 
         }else{
             var params = {};
+            params.eduType = EDU_TYPE;
             params.EDU_ID = eduId;
             params.STATE = "I";
             var opt = {};
@@ -240,7 +218,7 @@
             opt.height = "700";
             opt.scrollbars = "yes";
             opt.resizable = "yes";
-            lpCom.winOpen('/edu/safety/applyForm.do', "SAFETY 교육신청", params, opt);
+            lpCom.winOpen('/edu/unified/actionEduApplyForm.do', "SAFETY 교육신청", params, opt);
         }
     }
     /*===================================================사용자 함수종료 시작 =================================*/

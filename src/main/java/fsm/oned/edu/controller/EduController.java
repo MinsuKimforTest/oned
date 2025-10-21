@@ -6,7 +6,10 @@ import fsm.oned.comm.exception.UserException;
 import fsm.oned.comm.service.CommonService;
 import fsm.oned.comm.service.FlicCommonFileService;
 import fsm.oned.comm.util.CommonUtil;
+import fsm.oned.edu.service.EduApplyServiceFactory;
 import fsm.oned.edu.service.EduService;
+import fsm.oned.edu.service.PlorEduService;
+import fsm.oned.edu.service.SafetyEduService;
 import fsm.oned.organicCert.service.OrganicCertService;
 import fsm.oned.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +72,15 @@ public class EduController {
 
     @Autowired
     private FlicCommonFileService flicCommonFileService;
+
+    @Autowired
+    private PlorEduService plorEduService;
+
+    @Autowired
+    private SafetyEduService safetyEduService;
+
+    @Autowired
+    private EduApplyServiceFactory eduApplyServiceFactory;
 
     /**
      * 교육신청 - 리스트 화면이동
@@ -360,15 +372,26 @@ public class EduController {
         if(((BigDecimal)classMap.get("STUDY_RATE_AVG")).intValue() >= 100 && classMap.get("EDU_CERT_NO").equals("")){
             //이수증 발급
             Map<String,Object> applyMap = service.selectEduApplyInfo(paramMap);
-            if(applyMap.get("GBN").equals("1")){
-                resBodyMap.put("eduCertNo", service.saveEduCertInfo(applyMap));
-            }else{
-                resBodyMap.put("eduCertNo", service.saveEduCertHaccpInfo(applyMap));
+            String gbn = applyMap.get("GBN").toString();
+
+            log.info("selectEduApplyInfo gbn : " + gbn);
+
+            switch (gbn) {
+                case "1":
+                    resBodyMap.put("eduCertNo", service.saveEduCertInfo(applyMap));
+                    service.sendEduCompleteSms(applyMap);
+                    break;
+                case "2":
+                    resBodyMap.put("eduCertNo", service.saveEduCertHaccpInfo(applyMap));
+                    service.sendEduCompleteSms(applyMap);
+                    break;
+
+                default:
+                    resBodyMap.put("eduCertNo", eduApplyServiceFactory.getService(gbn).saveEduCertInfo(applyMap));
+
             }
-
-
             //교육이수 완료 문자발송
-            service.sendEduCompleteSms(applyMap);
+
 
             //최초사업자인 경우 친환경 인증번호 확인
             Map<String, Object> orgCertMap = organicCertService.selectOrganicCertNo(paramMap);

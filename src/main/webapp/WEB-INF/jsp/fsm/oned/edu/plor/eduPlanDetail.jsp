@@ -61,10 +61,6 @@
                                 <col width="85%">
                             </colgroup>
                             <tr>
-                                <th>구분</th>
-                                <td><c:out value="${result.EDU_GUBUN_NM}"/></td>
-                            </tr>
-                            <tr>
                                 <th>교육명</th>
                                 <td><c:out value="${result.EDU_TITLE}"/></td>
                             </tr>

@@ -53,13 +53,6 @@
                         </colgroup>
                         <tbody>
                             <tr>
-                                <th>구분</th>
-                                <td>
-                                    <c:out value="${eduData.EDU_GUBUN_NM}"/>
-                                    <input type="hidden" id="EDU_GUBUN" value="<c:out value="${eduData.EDU_GUBUN}"/>"/>
-                                </td>
-                            </tr>
-                            <tr>
                                 <th>교육명</th>
                                 <td><c:out value="${eduData.EDU_TITLE}"/></td>
                             </tr>
@@ -258,8 +251,6 @@
 <!-- //popup wrap --->
 
 <!-- 교육신청안내 -->
-<%@include file="../edu/eduNoticePopup.jsp"%>
-
 <%@include file="../../comm/inc_javascript.jsp"%>
 <script>
     /*===================================================페이지 초기화,콜백함수 시작=============================*/

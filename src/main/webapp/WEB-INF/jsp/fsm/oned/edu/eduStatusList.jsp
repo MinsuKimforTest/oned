@@ -206,8 +206,21 @@
         opt.height = "700";
         opt.scrollbars = "yes";
         opt.resizable = "yes";
-        opt.postData = {EDU_APLY_NO:eduAplyNo, STATE:"R", GBN:gbn};
-        lpCom.winOpen('/edu/actionEduApplyForm.do', "교육신청", params, opt);
+        opt.postData = {EDU_APLY_NO:eduAplyNo, STATE:"R", GBN:gbn, eduType:gbn};
+
+        switch (gbn) {
+            case "PLOR":
+                url = "/edu/unified/actionEduApplyForm.do";
+                break;
+            case "SAFETY":
+                url = "/edu/unified/actionEduApplyForm.do";
+                break;
+            default:
+                url = "/edu/actionEduCertForm.do";
+                return;
+        }
+
+        lpCom.winOpen(url, "교육신청", params, opt);
     }
 
     //교육 이수증
@@ -218,10 +231,24 @@
             var params = {};
             params.EDU_CERT_NO = eduCertNo;
             params.GBN = gbn;
+            params.eduType = gbn;
             var opt = {};
             opt.width = "750";
             opt.height = "640";
-            lpCom.winOpen('/edu/actionEduCertForm.do', "교육 이수증", params, opt);
+
+            switch (gbn) {
+                case "PLOR":
+                    url = "/edu/unified/actionEduCertForm.do";
+                    break;
+                case "SAFETY":
+                    url = "/edu/unified/actionEduCertForm.do";
+                    break;
+                default:
+                    url = "/edu/actionEduCertForm.do";
+                    return;
+            }
+
+            lpCom.winOpen(url, "교육 이수증", params, opt);
         }
     }
     /*===================================================사용자 함수종료 시작 =================================*/
